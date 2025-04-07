@@ -1,6 +1,15 @@
 # MCP_Voice_Transfer
-![image](https://github.com/user-attachments/assets/fdbc5997-f5dd-4aa6-b750-6c5f35a052ab)
+![image](https://github.com/user-attachments/assets/376c3971-00b6-437f-9489-a562320c7615)
 
+
+# 전체 흐름 예시
+1. 사용자: "헤이 플러터, 철수한테 만 원 보내줘"
+2. Android Service가 웨이크워드 감지 + 음성 인식 시작
+3. 음성 텍스트 → LLM 서버로 전달
+4. LLM 서버: 의도 감지 → { intent: 송금, 대상: 철수, 금액: 10000 }
+5. 앱 or Android Service가 송금 서버에 API 호출
+6. 송금 성공 → 결과를 Android TTS로 읽어줌 ("철수에게 1만 원 송금했습니다")
+7. 앱이 있다면 → 송금 내역 저장 + UI로 보여줌
 
 # 프로젝트 프로세스
 

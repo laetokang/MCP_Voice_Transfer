@@ -157,9 +157,9 @@
 ## 📌 기술 스택
 
 - **백엔드**: FastAPI, SQLite or Redis
-- **LLM 연동**: Ollama + EXAONE-DEEP
+- **LLM 연동**: ???Ollama + EXAONE-DEEP
 - **모바일**: Flutter or Android(Java/Kotlin)
-- **음성 처리**: Android STT / TTS API
+- **음성 처리**: ???Android STT / TTS API
 - **MCP**: 모델 호출 인터페이스 규약 기반 REST API
 
 ---

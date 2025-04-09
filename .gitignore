@@ -1,0 +1,58 @@
+# ───────────────────────────
+# Flutter / Dart 관련 (frontend)
+# ───────────────────────────
+frontend/.dart_tool/
+frontend/.packages
+frontend/.pub-cache/
+frontend/build/
+frontend/.idea/
+frontend/.vscode/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.melos_tool/
+frontend/android/.gradle/
+frontend/android/app/debug/
+frontend/android/app/profile/
+frontend/android/app/release/
+frontend/ios/Pods/
+frontend/ios/.symlinks/
+frontend/ios/Flutter/
+frontend/ios/.generated/
+frontend/macos/Flutter/
+frontend/macos/.generated/
+frontend/*.iml
+
+# ───────────────────────────
+# 민감 정보
+# ───────────────────────────
+frontend/.env
+frontend/*.key
+frontend/*.jks
+frontend/*.keystore
+
+# ───────────────────────────
+# 실행 파일 및 임시 파일
+# ───────────────────────────
+*.log
+*.tmp
+*.lock
+*.apk
+*.ipa
+*.app
+*.so
+
+# ───────────────────────────
+# Firebase (선택)
+# ───────────────────────────
+frontend/.firebase/
+
+# ───────────────────────────
+# 기타
+# ───────────────────────────
+frontend/coverage/
+
+
+# Python 백엔드 관련
+backend/venv/
+backend/__pycache__/
+backend/*.pyc

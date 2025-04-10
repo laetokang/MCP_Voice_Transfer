@@ -1,10 +1,7 @@
 # MCP_Voice_Transfer
-![dLLVQnfF57sVJt7nQGMJ_7wlWYMM8WJI6h3jKryMtJPIkygwba8fsCG4gHPCeoYfiGPCOe81DNzg8P-cZpkptw7NyRfsOgL_V36vS-wPS-wS6LUpjcxPkLSffiVjj0LYgoSEpaIhmZ9OJyQJ6TsqmHT9vMpRmENQ0BGdQo0A7T6k-NsWPo6SoQZWi9cmqia4n0phTJ9kI13zhGBNrnyYKvCF2w15zAmTtbYRKEA](https://github.com/user-attachments/assets/50a5d7e4-082b-4570-92b2-db86f93f86d5)
-
-
-
 
 # 전체 흐름 예시
+![dLLVQnfF57sVJt7nQGMJ_7wlWYMM8WJI6h3jKryMtJPIkygwba8fsCG4gHPCeoYfiGPCOe81DNzg8P-cZpkptw7NyRfsOgL_V36vS-wPS-wS6LUpjcxPkLSffiVjj0LYgoSEpaIhmZ9OJyQJ6TsqmHT9vMpRmENQ0BGdQo0A7T6k-NsWPo6SoQZWi9cmqia4n0phTJ9kI13zhGBNrnyYKvCF2w15zAmTtbYRKEA](https://github.com/user-attachments/assets/50a5d7e4-082b-4570-92b2-db86f93f86d5)
 1. 플러터 앱 내 음성 송금 기능 ON 설정
 2. 사용자: "헤이 플러터, 철수한테 만 원 보내줘"
 3. Android Service가 웨이크워드 감지 + 음성 인식 시작
@@ -74,6 +71,12 @@
 
 
 <br>
+
+
+# 📊 시스템 아키텍처 개요
+![TLNVJzjM57w_VyLHNmPQArGU-p2LbMr2AXDQCkrXtOENc11XREIOLjKqAQK6PP29T4tQmEmiMGbaKwevFw2HrhzcZxx7_yFEpR7he6n8WOllzvtZyttVWVibHxETlHr3E4N7q07zAhe322U139g0XvrmKW4yzl3eF3hm01jkj4-ddt7OX0Ly_GOlo_0neEl9eGjHeud-M4wgyg8lNtgBGfIsY-QkPcixaBDsTYr](https://github.com/user-attachments/assets/eae07919-165f-429b-9834-acbf78405abc)
+
+</br>
 
 ## 2. 모델 성능 검증
 

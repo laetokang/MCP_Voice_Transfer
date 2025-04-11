@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
-
+import 'package:voicetransfer/features/stt/stt_service.dart';
+import 'package:voicetransfer/features/stt/stt_controller.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,6 @@ void _requestPermission() async {
     await Permission.microphone.request();
   }
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -42,11 +41,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late final SttController _sttController;
   final ScrollController _scrollController = ScrollController();
-  final stt.SpeechToText _speech = stt.SpeechToText();
-  bool _isListening = false;
   final List<Map<String, String>> messages = [
-    {"text": "안녕하세요. 김선민님!\n오늘은 무엇을 도와드릴까요?", "type": "system"}
+    {"text": "안녕하세요. 김선민님!\n오늘은 무엇을 도와드릴까요?", "type": "system"},
   ];
   final TextEditingController _textController = TextEditingController();
 
@@ -54,79 +52,18 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _requestPermission(); // 퍼미션 요청
-  }
-
-  void _startListening() async {
-    bool available = await _speech.initialize(
-      onStatus: (val) {
-        log('🎤 [STT 상태] $val');
-        print('🎤 [STT 상태] $val');
+    _sttController = SttController(
+      textController: _textController,
+      onSubmit: _handleSubmitted,
+      onUserMessage: (text) {
+        setState(() {
+          messages.add({"text": text, "type": "user"});
+        });
       },
-      onError: (val) {
-        log('❌ [STT 오류] $val');
-        if (autoSend && val.permanent) {
-          Future.delayed(Duration(milliseconds: 500), () {
-            _startListening(); // 에러 후 재시작
-          });
-        }
-      },
+      setState: setState,
+      scrollToBottom: _scrollToBottom,
+      autoSend: () => autoSend,
     );
-
-    if (available) {
-      setState(() => _isListening = true);
-      print('🎙️ [STT 시작됨]');
-
-      _speech.listen(
-        localeId: "ko_KR",
-        listenMode: stt.ListenMode.dictation, // 연속 말하기용 모드
-        pauseFor: const Duration(seconds: 5), // 침묵 시 종료 전 대기 시간
-        listenFor: const Duration(minutes: 1),
-        onResult: (val) {
-          log('🗣️ [STT 인식 중] ${val.recognizedWords}');
-          print('🗣️ [STT 인식 중] ${val.recognizedWords}');
-
-          setState(() {
-            _textController.text = val.recognizedWords;
-            _textController.selection = TextSelection.fromPosition(
-              TextPosition(offset: _textController.text.length),
-            );
-          });
-
-          if (val.finalResult) {
-            print('✅ [STT 인식 완료]');
-            _stopListening();
-
-            if (autoSend) {
-              _handleSubmitted(val.recognizedWords);
-              _textController.clear();
-
-              // ✅ STT 재시작!
-              Future.delayed(const Duration(milliseconds: 500), () {
-                if (autoSend) _startListening();
-              });
-            } else {
-              setState(() {
-                messages.add({
-                  "text": val.recognizedWords,
-                  "type": "user",
-                });
-                _textController.clear();
-              });
-              _scrollToBottom();
-            }
-          }
-
-        },
-      );
-    } else {
-      print('❌ [STT 사용 불가]');
-    }
-  }
-
-
-  void _stopListening() {
-    _speech.stop();
-    setState(() => _isListening = false);
   }
 
   void _scrollToBottom() {
@@ -148,15 +85,18 @@ class _MyHomePageState extends State<MyHomePage> {
       _scrollToBottom();
     });
 
-    final chatHistory = messages.map((msg) {
-      return {
-        "role": msg["type"] == "user" ? "user" : "assistant",
-        "content": msg["text"]!,
-      };
-    }).toList();
+    final chatHistory =
+        messages.map((msg) {
+          return {
+            "role": msg["type"] == "user" ? "user" : "assistant",
+            "content": msg["text"]!,
+          };
+        }).toList();
 
     final request = http.Request(
-        "POST", Uri.parse("https://api.openai.com/v1/chat/completions"));
+      "POST",
+      Uri.parse("https://api.openai.com/v1/chat/completions"),
+    );
     request.headers.addAll({
       'Authorization': 'Bearer YOUR_API_KEY_HERE', // 🔐 OpenAI API 키 넣기!
       'Content-Type': 'application/json',
@@ -167,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "messages": chatHistory,
       "temperature": 0.7,
       "max_tokens": 500,
-      "stream": true
+      "stream": true,
     });
 
     try {
@@ -176,48 +116,51 @@ class _MyHomePageState extends State<MyHomePage> {
         String replyText = "";
         int chatbotIndex = messages.length - 1;
 
-        response.stream.transform(utf8.decoder).listen(
+        response.stream
+            .transform(utf8.decoder)
+            .listen(
               (chunk) {
-            final lines = chunk.split("\n");
-            for (var line in lines) {
-              if (line.startsWith("data:")) {
-                String jsonStr = line.substring(5).trim();
-                if (jsonStr.isNotEmpty && jsonStr != "[DONE]") {
-                  try {
-                    final jsonData = jsonDecode(jsonStr);
-                    final delta =
-                    jsonData['choices'][0]['delta']['content'] as String?;
-                    if (delta != null) {
-                      replyText += delta;
-                      setState(() {
-                        messages[chatbotIndex] = {
-                          "text": replyText,
-                          "type": "system"
-                        };
-                      });
-                      _scrollToBottom();
+                final lines = chunk.split("\n");
+                for (var line in lines) {
+                  if (line.startsWith("data:")) {
+                    String jsonStr = line.substring(5).trim();
+                    if (jsonStr.isNotEmpty && jsonStr != "[DONE]") {
+                      try {
+                        final jsonData = jsonDecode(jsonStr);
+                        final delta =
+                            jsonData['choices'][0]['delta']['content']
+                                as String?;
+                        if (delta != null) {
+                          replyText += delta;
+                          setState(() {
+                            messages[chatbotIndex] = {
+                              "text": replyText,
+                              "type": "system",
+                            };
+                          });
+                          _scrollToBottom();
+                        }
+                      } catch (e) {
+                        log("JSON 파싱 오류: $e");
+                      }
                     }
-                  } catch (e) {
-                    log("JSON 파싱 오류: $e");
                   }
                 }
-              }
-            }
-          },
-          onError: (error) {
-            setState(() {
-              messages[chatbotIndex] = {
-                "text": "네트워크 오류 발생: $error",
-                "type": "system"
-              };
-            });
-          },
-        );
+              },
+              onError: (error) {
+                setState(() {
+                  messages[chatbotIndex] = {
+                    "text": "네트워크 오류 발생: $error",
+                    "type": "system",
+                  };
+                });
+              },
+            );
       } else {
         setState(() {
           messages.last = {
             "text": "Error: ${response.statusCode}",
-            "type": "system"
+            "type": "system",
           };
         });
       }
@@ -227,6 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
+
   bool autoSend = false;
   @override
   Widget build(BuildContext context) {
@@ -234,7 +178,6 @@ class _MyHomePageState extends State<MyHomePage> {
       resizeToAvoidBottomInset: true,
       body: Column(
         children: [
-
           Expanded(
             child: SingleChildScrollView(
               controller: _scrollController,
@@ -250,32 +193,36 @@ class _MyHomePageState extends State<MyHomePage> {
                         autoSend = value;
                       });
                       if (value) {
-                        _startListening();
+                        _sttController.startListening();
                       } else {
-                        _stopListening(); // 꺼졌을 땐 STT 중지도 추가해도 좋아요
+                        _sttController
+                            .stopListening(); // 꺼졌을 땐 STT 중지도 추가해도 좋아요
                       }
                     },
                   ),
                   for (var message in messages)
                     Align(
-                      alignment: message['type'] == 'user'
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
+                      alignment:
+                          message['type'] == 'user'
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
                       child: Container(
                         margin: const EdgeInsets.symmetric(vertical: 5),
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: message['type'] == 'user'
-                              ? Colors.brown
-                              : Colors.grey.shade300,
+                          color:
+                              message['type'] == 'user'
+                                  ? Colors.brown
+                                  : Colors.grey.shade300,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           message['text']!,
                           style: TextStyle(
-                            color: message['type'] == 'user'
-                                ? Colors.white
-                                : Colors.black,
+                            color:
+                                message['type'] == 'user'
+                                    ? Colors.white
+                                    : Colors.black,
                           ),
                         ),
                       ),
@@ -332,8 +279,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-
     );
   }
-
 }

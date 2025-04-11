@@ -44,9 +44,9 @@ MCP_Voice_Transfer는 **모바일 음성 명령 기반 송금 시스템**을 목
 
 ## 📑 상세 문서 보기
 
-- [모델 성능 테스트 (STT, NLU, FDS)](./docs/model_evaluation.md)
+- [모델 성능 테스트 (STT, NLU, FDS)](./backend/README.md)
 - [백엔드 API 설명서](./backend/README.md)
-- [모바일 앱 구조](./mobile/README.md)
+- [모바일 앱 구조](./frontend/README.md)
 
 
 </br>

@@ -26,69 +26,23 @@ MCP_Voice_Transfer는 **모바일 음성 명령 기반 송금 시스템**을 목
 
 <br>
 
-## 프로젝트 프로세스
-
-## 🧭 프로젝트 로드맵
-
-### [1단계] 기본 백엔드 로직 구성 (FastAPI 기반)
-
-- **[1] 더미 계좌 생성**✅
-  - 사용자별 계좌번호, 이름, 초기 잔액 설정
-  - 샘플 JSON / SQLite 등으로 저장
-
-- **[2] 시뮬레이션 송금 처리**✅
-  - 잔액 확인 → 송금 성공/실패 처리
-  - 트랜잭션 ID, 타임스탬프 반환
-
-- **[4] `/intent` API 구현**
-  - 발화 예시: `"엄마한테 3만원 보내줘"`
-  - 결과 예시: `{"intent": "송금", "to": "엄마", "amount": 30000}`
-
-- **[5] `/transfer` API 구현**
-  - `/intent` 결과를 받아 실제 송금 시뮬레이션 수행
-
-- **[6] `/log` API (대화 로그 저장)**
-  - 입력, 의도, 응답 결과 등을 JSON or MongoDB에 저장
-
----
-
-### [2단계] 시뮬레이터와 예외 처리
-
-- **[7] 텍스트 기반 시뮬레이터**
-  - CLI 기반으로 대화 흐름 시뮬레이션 가능 (예: `input()` + REST 호출)
-
-- **[8] 슬롯 누락 예외 처리**
-  - 누락된 슬롯(`to`, `amount`)에 대한 추가 질문 설계
-  - 예: "엄마한테 보내줘" → 금액 누락 → "얼마를 보내드릴까요?"
-
-- **[9] 인증 단계 모킹**
-  - 예시: 지문 인증 or 인증 코드 입력 흐름을 가짜 토큰으로 대체
-
----
-
-### [3단계] 모바일 연동 및 OS 확장
-
-- **[10] Android STT + TTS 연동**
-  - STT: 사용자 발화 → 텍스트 변환
-  - TTS: 서버 응답 → 음성 안내로 출력
-
-- **[11] FastAPI 연동 Android 클라이언트**
-  - Retrofit 등으로 `/intent`, `/transfer` 호출
-  - 챗 UI 또는 음성 기반 UI 제공
-
-- **[12] OS 서비스로 확장**
-  - `VoiceInteractionService` 활용
-  - 웨이크업 키워드 ("아라야") → 바로 송금 대화 시작 가능
-
-
-<br>
-
 
 ## 📊 시스템 아키텍처 개요
 ![image](https://github.com/user-attachments/assets/43f9beb7-c5c7-4e42-bec5-8de5b2c4c924)
 
 
 
+
+</br>
+
+
+## 📌 기술 스택
+
+- **백엔드**: FastAPI, SQLite or Redis
+- **LLM 연동**: ???Ollama + EXAONE-DEEP
+- **모바일**: Flutter or Android(Java/Kotlin)
+- **음성 처리**: ???Android STT / TTS API
+- **MCP**: 모델 호출 인터페이스 규약 기반 REST API
 
 </br>
 
@@ -174,7 +128,6 @@ MCP_Voice_Transfer는 **모바일 음성 명령 기반 송금 시스템**을 목
 
 ---
 
-
 ## 👥 팀 역할 분담표
 
 | 이름     | 역할                        | 주요 업무                                                                | 연락처 | 
@@ -188,17 +141,7 @@ MCP_Voice_Transfer는 **모바일 음성 명령 기반 송금 시스템**을 목
 | 변민찬   | 💡 RAG 흐름  | 서버 기반 RAG 흐름 제안, 의도별 발화 시나리오 설계, LLM 연동 구조 논의              ||
 | 강혜리   | ⚙️ MLOps / 배포 환경 설계   | 서비스 배포 및 운영 자동화 파이프라인 구축 예정, 클라우드 구조 논의 예정             ||
 
----
 
-## 📌 기술 스택
-
-- **백엔드**: FastAPI, SQLite or Redis
-- **LLM 연동**: ???Ollama + EXAONE-DEEP
-- **모바일**: Flutter or Android(Java/Kotlin)
-- **음성 처리**: ???Android STT / TTS API
-- **MCP**: 모델 호출 인터페이스 규약 기반 REST API
-
----
 
 ## 🛡️ 보안 주의
 

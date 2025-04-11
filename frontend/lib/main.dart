@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:voicetransfer/features/stt/stt_service.dart';
 import 'package:voicetransfer/features/stt/stt_controller.dart';
+import 'package:voicetransfer/features/nlu/nlu_preprocessor.dart';
+import 'package:voicetransfer/features/nlu/nlu_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -54,7 +56,27 @@ class _MyHomePageState extends State<MyHomePage> {
     _requestPermission(); // 퍼미션 요청
     _sttController = SttController(
       textController: _textController,
-      onSubmit: _handleSubmitted,
+      onSubmit: (recognizedText) async {
+        setState(() {
+          messages.add({"text": recognizedText, "type": "user"});
+          messages.add({"text": "", "type": "system"});
+          _scrollToBottom();
+        });
+        final cleanedText = postprocessText(recognizedText);
+
+        // ✅ NLU 분석 요청
+        final result = await NluService.analyze(cleanedText);
+
+        // 예시: { intent: '송금', slots: { to: '엄마', amount: 10000 } }
+        print("🎯 분석 결과: ${result.intent}, ${result.slots}");
+        setState(() {
+          messages.add({
+            "text": "🎯 분석 결과: ${result.intent}, ${result.slots}",
+            "type": "system",
+          });
+          _scrollToBottom();
+        });
+      },
       onUserMessage: (text) {
         setState(() {
           messages.add({"text": text, "type": "user"});

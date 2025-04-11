@@ -74,7 +74,10 @@
 
 
 # 📊 시스템 아키텍처 개요
-![TLNVJzjM57w_VyLHNmPQArGU-p2LbMr2AXDQCkrXtOENc11XREIOLjKqAQK6PP29T4tQmEmiMGbaKwevFw2HrhzcZxx7_yFEpR7he6n8WOllzvtZyttVWVibHxETlHr3E4N7q07zAhe322U139g0XvrmKW4yzl3eF3hm01jkj4-ddt7OX0Ly_GOlo_0neEl9eGjHeud-M4wgyg8lNtgBGfIsY-QkPcixaBDsTYr](https://github.com/user-attachments/assets/eae07919-165f-429b-9834-acbf78405abc)
+![image](https://github.com/user-attachments/assets/43f9beb7-c5c7-4e42-bec5-8de5b2c4c924)
+
+
+
 
 </br>
 

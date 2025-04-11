@@ -38,7 +38,8 @@ MCP_Voice_Transfer는 **모바일 음성 명령 기반 송금 시스템**을 목
 </br>
 
 ## 📊 시스템 아키텍처 개요
-![image](https://github.com/user-attachments/assets/43f9beb7-c5c7-4e42-bec5-8de5b2c4c924)
+![image](https://github.com/user-attachments/assets/719b81a1-08b0-47b4-9286-baf9e49149e6)
+
 
 </br>
 

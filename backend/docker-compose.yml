@@ -1,0 +1,40 @@
+version: "3"
+services:
+  redis:
+    image: redis
+    ports: ["6379:6379"]
+
+  stt:
+    build: ./backend/stt
+    ports: ["7001:7001"]
+    depends_on: [redis]
+
+  llm:
+    build: ./backend/llm
+    ports: ["7002:7002"]
+    depends_on: [redis]
+
+  fds:
+    build: ./backend/fds
+    ports: ["7003:7003"]
+    depends_on: [redis]
+
+  auth:
+    build: ./backend/auth
+    ports: ["7004:7004"]
+    depends_on: [redis]
+
+  transfer:
+    build: ./backend/transfer
+    ports: ["7005:7005"]
+    depends_on: [redis]
+
+  gateway:
+    build: ./backend/gateway
+    ports: ["8000:8000"]
+    depends_on:
+      - stt
+      - llm
+      - fds
+      - auth
+      - transfer

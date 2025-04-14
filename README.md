@@ -1,57 +1,14 @@
 # MCP_Voice_Transfer
-![dLLVQnfF57sVJt7nQGMJ_7wlWYMM8WJI6h3jKryMtJPIkygwba8fsCG4gHPCeoYfiGPCOe81DNzg8P-cZpkptw7NyRfsOgL_V36vS-wPS-wS6LUpjcxPkLSffiVjj0LYgoSEpaIhmZ9OJyQJ6TsqmHT9vMpRmENQ0BGdQo0A7T6k-NsWPo6SoQZWi9cmqia4n0phTJ9kI13zhGBNrnyYKvCF2w15zAmTtbYRKEA](https://github.com/user-attachments/assets/50a5d7e4-082b-4570-92b2-db86f93f86d5)
 
+MCP_Voice_Transfer는 **모바일 음성 명령 기반 송금 시스템**을 목표로 합니다.  
 
+## 주요 특징
 
-
-# 전체 흐름 예시
-1. 플러터 앱 내 음성 송금 기능 ON 설정
-2. 사용자: "헤이 플러터, 철수한테 만 원 보내줘"
-3. Android Service가 웨이크워드 감지 + 음성 인식 시작
-4. 음성 텍스트 → LLM 서버로 전달
-5. LLM 서버: 의도 감지 → { intent: 송금, 대상: 철수, 금액: 10000 }
-6. 이상거래탐지 내 송금 내역 전달
-7. 음성 인증
-8. 앱 or Android Service가 송금 서버에 API 호출
-9. 송금 성공 → 결과를 Android TTS로 읽어줌 ("철수에게 1만 원 송금했습니다")
-10. 앱이 있다면 → 송금 내역 저장 + UI로 보여줌
-
-<br>
-
-# 프로젝트 프로세스
-
-## 🧭 프로젝트 로드맵
-
-### [1단계] 기본 백엔드 로직 구성 (FastAPI 기반)
-
-- **[1] 더미 계좌 생성**✅
-  - 사용자별 계좌번호, 이름, 초기 잔액 설정
-  - 샘플 JSON / SQLite 등으로 저장
-
-- **[2] 시뮬레이션 송금 처리**✅
-  - 잔액 확인 → 송금 성공/실패 처리
-  - 트랜잭션 ID, 타임스탬프 반환
-
-- **[4] `/intent` API 구현**
-  - 발화 예시: `"엄마한테 3만원 보내줘"`
-  - 결과 예시: `{"intent": "송금", "to": "엄마", "amount": 30000}`
-
-- **[5] `/transfer` API 구현**
-  - `/intent` 결과를 받아 실제 송금 시뮬레이션 수행
-
-- **[6] `/log` API (대화 로그 저장)**
-  - 입력, 의도, 응답 결과 등을 JSON or MongoDB에 저장
-
----
-
-### [2단계] 시뮬레이터와 예외 처리
-
-- **[7] 텍스트 기반 시뮬레이터**
-  - CLI 기반으로 대화 흐름 시뮬레이션 가능 (예: `input()` + REST 호출)
-
-- **[8] 슬롯 누락 예외 처리**
-  - 누락된 슬롯(`to`, `amount`)에 대한 추가 질문 설계
-  - 예: "엄마한테 보내줘" → 금액 누락 → "얼마를 보내드릴까요?"
+* **음성 기반 인터페이스**: Android/Flutter 환경에서 Wakeword 감지. STT + TTS를 통한 자연스러운 사용자 경험 제공
+* **효율적인 백엔드**: FastAPI 기반의 비동기 처리 및 모듈화 아키텍처 설계
+* **LLM**: LLM 기반 의도 분석 및 RAG 연계
+* **이상탐지**: 이상거래 탐지 및 음성 인증 탑재
+* **실시간 처리**: 실시간 추론 및 온디바이스 경량 모델 적용을 통해 빠른 응답 제공
 
 - **[9] 인증 단계 모킹**
   - 예시: 지문 인증 or 인증 코드 입력 흐름을 가짜 토큰으로 대체
@@ -98,85 +55,68 @@
 - **예시**:
 | 실제 문장              | STT 결과                         | WER |
 |------------------------|----------------------------------|-----|
-| 엄마한테 오만원 보내줘 | 엄마 한테 5만 원 보내 줘         | 0% (거의 정확) |
+| 엄마한테 오만원 보내줘 | 엄마 한테 5만 원 보내 줘         | ? |
 
 
-### 2. NLU (Intent / Slot 분석)
+## 전체 시스템 흐름 
+![dLLVQnfF57sVJt7nQGMJ_7wlWYMM8WJI6h3jKryMtJPIkygwba8fsCG4gHPCeoYfiGPCOe81DNzg8P-cZpkptw7NyRfsOgL_V36vS-wPS-wS6LUpjcxPkLSffiVjj0LYgoSEpaIhmZ9OJyQJ6TsqmHT9vMpRmENQ0BGdQo0A7T6k-NsWPo6SoQZWi9cmqia4n0phTJ9kI13zhGBNrnyYKvCF2w15zAmTtbYRKEA](https://github.com/user-attachments/assets/50a5d7e4-082b-4570-92b2-db86f93f86d5)
+1.  **음성 명령**: 사용자가 앱에서 "헤이 플러터, 철수한테 만 원 보내줘" 라고 말합니다.
+2.  **Wakeword & STT**: Android 서비스가 Wakeword("헤이 플러터")를 감지하고 음성 인식을 시작하여 텍스트로 변환합니다.
+3.  **NLU (의도 분석)**: 변환된 텍스트를 백엔드 LLM 서버로 전달하여 `송금` 의도와 `대상: 철수`, `금액: 10000` 등의 정보를 추출합니다.
+4.  **FDS (이상거래 탐지)**: 추출된 송금 정보를 기반으로 이상 거래 여부를 탐지합니다.
+5.  **음성 인증**: 등록된 사용자의 목소리가 맞는지 화자 인증을 수행합니다.
+6.  **송금 실행**: 모든 검증이 완료되면, 송금 서버에 API를 호출하여 (시뮬레이션) 송금을 실행합니다.
+7.  **결과 안내 (TTS)**: 송금 결과를 "철수에게 1만 원 송금했습니다" 와 같이 음성으로 안내합니다.
+8.  **UI 업데이트**: 앱 화면에 송금 내역을 표시하고 저장합니다.
 
-- **검증 목표**: 사용자의 의도를 정확히 분류하고, 슬롯을 추출하는 능력 평가
-- **평가 지표**:
-- Intent: Accuracy
-- Slot: Precision / Recall / F1-score
+</br>
 
-**예시 데이터**:
 
-```json
-{
-  "text": "아빠한테 만원 보내줘",
-  "intent": "transfer",
-  "slots": {
-    "recipient": "아빠",
-    "amount": "10000"
-  }
-}
-```
+## 🛠️ 기술 스택
 
-### 3. 음성 로그 데이터 처리
+* **Backend**: FastAPI (Python), SQLite (기본), Redis (캐싱/세션 관리용 고려)
+* **LLM & NLU**: Ollama (phi3-mini 등 sLM 기반), EXAONE-DEEP (LG AI Research) 연동 고려
+* **Frontend**: Flutter (Cross-platform), Android Native (음성 처리 연동)
+* **Voice**: Android STT/TTS API, On-Device STT 모델 (연구/개발 중)
+* **FDS/Auth**: Rule-based FDS, ECAPA-TDNN 등 경량 화자 인식 모델
+* **Infra**: Docker, (추후 MLOps 파이프라인 구축 예정)
+* **MCP**: 표준 모델 호출 인터페이스 규약 기반 REST API 설계
 
-- **검증 목표**: 사용자-시스템 간 대화 흐름과 송금 요청/응답을 정확히 기록하고 관리
+</br>
 
-#### 검증 항목
-- 로그 정합성 (누락된 필드 없음)
-- 대화 흐름 추적 가능 여부
-- 검색 정확도 (특정 조건 거래 필터링 등)
+## 📊 시스템 아키텍처 개요
+![image](https://github.com/user-attachments/assets/719b81a1-08b0-47b4-9286-baf9e49149e6)
 
-#### 예시 로그 구조 (JSON)
-```json
-{
-  "timestamp": "2025-04-06T10:00:00Z",
-  "text": "엄마한테 3만원 보내줘",
-  "intent": "transfer",
-  "slots": {
-    "recipient": "엄마",
-    "amount": 30000
-  },
-  "authenticated": true,
-  "transfer_status": "success"
-}
-```
 
-### 4. 이상거래 탐지 시스템
+</br>
 
-- **검증 목표**: 비정상/의심 거래 탐지 정확도 측정
-- **사용 데이터**: [IEEE-CIS Fraud Detection Dataset (Kaggle)](https://www.kaggle.com/competitions/ieee-fraud-detection)
+## 📑 상세 문서 보기
 
-#### 평가 지표
+- [모델 성능 테스트 (STT, NLU, FDS)](./backend/README.md)
+- [백엔드 API 설명서](./backend/README.md)
+- [모바일 앱 구조](./frontend/README.md)
 
-- **Precision**: 탐지된 거래 중 실제 이상거래일 확률  
-  → `Precision = TP / (TP + FP)`
-  
-- **Recall**: 전체 이상거래 중 모델이 탐지한 비율  
-  → `Recall = TP / (TP + FN)`
-  
-- **F1-score**: Precision과 Recall의 조화 평균  
-  → `F1 = 2 * (Precision * Recall) / (Precision + Recall)`
-  
-- **AUC (Area Under Curve)**: ROC 곡선 아래 면적, 전체 분류 성능 지표  
-  → 1에 가까울수록 성능 우수
+
+</br>
 
 
 
 ---
 
-## 📌 기술 스택
+## 👥 팀 역할 분담
 
-- **백엔드**: FastAPI, SQLite or Redis
-- **LLM 연동**: ???Ollama + EXAONE-DEEP
-- **모바일**: Flutter or Android(Java/Kotlin)
-- **음성 처리**: ???Android STT / TTS API
-- **MCP**: 모델 호출 인터페이스 규약 기반 REST API
+| 이름     | 역할                        | 주요 업무                                                                | 연락처 | 
+|----------|-----------------------------|----------------------------------------------------------------------------------------|--|
+| 김선민   | 🧭 총괄 / 시스템 아키텍처 / 풀스택 개발  | 전체 시스템 설계, FastAPI 기반 백엔드 및 Flutter 앱 전체 개발, 폴더 구조/도커화, 음성 송금 기능 구성 |seonmin8284@gmail.com|
+| 임은서   | 🔍 이상거래탐지(FDS)         | 이상거래 알고리즘 조사, 금융권 기준 탐지 룰 정리, FDS 회의 주도                      |cmdysp@naver.com|
+| 김서령   | 🔍 이상거래탐지(FDS)         | FDS 알고리즘 공동 담당, KYC 기반 설계 구상 중, 내부 테스트 협의 예정                 ||
+| 강병하   | 🧠 음성 AI (STT / TTS)   | STT/TTS API 성능 테스트, 온디바이스 STT 담당, 음성 전,후처리,                       |kbh0287@gmail.com|
+| 하진     | 🤖 경량 LLM (sLMs / NLU)     | phi3-mini 기반 NLU 처리, 의도 분석/슬롯 추출 설계, RAG 연동 고려                    |hajin0717@gmail.com|
+| 백두현   | 🔐 보이스 인증 / 화자인식    | ecapa-tdnn 등 경량 음성 인증 모델 탐색, 안티스푸핑 대응 검토                         ||
+| 변민찬   | 💡 RAG 흐름  | 서버 기반 RAG 흐름 제안, 의도별 발화 시나리오 설계, LLM 연동 구조 논의              ||
+| 강혜리   | ⚙️ MLOps / 배포 환경 설계   | 서비스 배포 및 운영 자동화 파이프라인 구축 예정, 클라우드 구조 논의 예정             ||
 
----
+
 
 ## 🛡️ 보안 주의
 

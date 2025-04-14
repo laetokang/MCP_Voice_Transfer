@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+service FDS {
+  rpc CheckTransaction (TransactionRequest) returns (FDSResponse);
+}
+
+message TransactionRequest {
+  string user_id = 1;
+  int32 amount = 2;
+  string recipient = 3;
+}
+
+message FDSResponse {
+  bool is_fraud = 1;
+  string reason = 2;
+}

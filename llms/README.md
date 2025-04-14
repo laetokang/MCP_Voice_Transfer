@@ -1,7 +1,7 @@
 
 # 📦 sLLMs 모듈 – Lightweight LLM-based NLU & Dialog Manager
 
-`sLLMs`는 사용자 음성 발화에서 텍스트를 받아, **의도(intent)** 와 **필수 정보(slot)** 를 추출하고  **대화 흐름(Dialog Flow)** 을 제어하는 경량 LLM 기반 모듈입니다.  
+`sLLMs`는 사용자 음성 발화에서 텍스트를 받아, **의도(intent)** 와 **필수 정보(slot)** 를 추출하고  **대화 흐름(Dialog Flow)** 을 제어하는 경량 LLM 기반 모듈입니다.  </br>
 온디바이스 모델 중심으로 설계되어, **빠른 응답성과 낮은 리소스 사용률**을 지향합니다.
 
 ---

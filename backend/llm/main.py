@@ -19,10 +19,10 @@ def run_chatbot_inference(input_text:str):
   "amount": ...,
   "recipient": "...",
   "response": "..."
-}}
+}} 
 
 문장: "{input_text}"
-→
+
 """
   inputs=tokenizer(prompt,return_tensors="pt")
   

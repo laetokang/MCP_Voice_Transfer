@@ -48,58 +48,82 @@ class SttServiceWhisper implements SttInterface {
   }
 
   @override
-  void listen({
-    required void Function(String text, bool isFinal) onResult,
-    Duration pauseFor = const Duration(seconds: 1),
-    Duration listenFor = const Duration(seconds: 5),
-    String localeId = 'ko_KR',
-  }) async {
-    if (_isRecording) return;
-    _isRecording = true;
-    _audioBuffer.clear();
+void listen({
+  required void Function(String text, bool isFinal) onResult,
+  Duration pauseFor = const Duration(seconds: 1),
+  Duration listenFor = const Duration(seconds: 5),
+  String localeId = 'ko_KR',
+}) async {
+  if (_isRecording) return;
+  _isRecording = true;
+  _audioBuffer.clear();
 
-    final streamController = StreamController<Uint8List>();
+  final streamController = StreamController<Uint8List>();
 
-    // 1. 스트림 리스너 등록
-    streamController.stream.listen((buffer) async {
-      _audioBuffer.addAll(buffer);
+  // 1. 스트림 리스너 등록
+  streamController.stream.listen((buffer) async {
+    _audioBuffer.addAll(buffer);
 
-      if (_audioBuffer.length >= 16000 * 2 * 2) {
-        final dir = await getApplicationDocumentsDirectory();
-        final filePath = '${dir.path}/streamed_audio.wav';
-        final file = File(filePath);
+    if (_audioBuffer.length >= 16000 * 2 * 2) {
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/streamed_audio.wav';
+      final file = File(filePath);
 
-        await _writeWavFile(Uint8List.fromList(_audioBuffer), file.path);
-        _audioBuffer.clear();
-        log?.inferenceStart = DateTime.now();
-        try {
-          final result = await whisper!.transcribe(
-            transcribeRequest: TranscribeRequest(
-              audio: file.path,
-              isTranslate: false,
-              isNoTimestamps: true,
-              splitOnWord: true,
-            ),
-          );
-          print("📜 Whisper 결과: ${result.text}");
-          onResult(result.text, true);
-        } catch (e) {
-          print("❌ Whisper 오류: $e");
-        }
+      // 💾 WAV 저장 시간 기록
+      await _writeWavFile(Uint8List.fromList(_audioBuffer), file.path);
+      final int wavSaveTime = DateTime.now().millisecondsSinceEpoch;
+      print("💾 [WAV Saved] $wavSaveTime ms");
+
+      _audioBuffer.clear();
+
+      // 🧠 추론 시작 시간
+      final int inferenceStartTime = DateTime.now().millisecondsSinceEpoch;
+      print("🧠 [Inference Start] $inferenceStartTime ms");
+      log?.inferenceStart = DateTime.now();
+
+      try {
+        final result = await whisper!.transcribe(
+          transcribeRequest: TranscribeRequest(
+            audio: file.path,
+            isTranslate: false,
+            isNoTimestamps: true,
+            splitOnWord: true,
+          ),
+        );
+
+        // ✅ 추론 완료 시간 및 전체 소요 시간
+        final int inferenceEndTime = DateTime.now().millisecondsSinceEpoch;
+        print("✅ [Inference Done] $inferenceEndTime ms (+${inferenceEndTime - inferenceStartTime}ms)");
+        print("⏱️ Total STT duration: ${inferenceEndTime - log!.micStart!.millisecondsSinceEpoch}ms");
+
+        log?.inferenceEnd = DateTime.now();
+        log?.printAll();
+
+        print("📜 Whisper 결과: ${result.text}");
+        onResult(result.text, true);
+      } catch (e) {
+        print("❌ Whisper 오류: $e");
       }
-    });
+    }
+  });
 
-    // 2. Recorder 시작 (toStream에 Sink 전달)
-    await _recorder.startRecorder(
-      codec: Codec.pcm16,
-      sampleRate: 16000,
-      numChannels: 1,
-      toStream: streamController.sink, // ✅ 여기!
-    );
-    log?.micStart = DateTime.now();
-    await Future.delayed(listenFor);
-    await stop();
-  }
+  // 2. Recorder 시작
+  await _recorder.startRecorder(
+    codec: Codec.pcm16,
+    sampleRate: 16000,
+    numChannels: 1,
+    toStream: streamController.sink,
+  );
+
+  // 🎙 마이크 시작 시간 기록
+  final int micStartTime = DateTime.now().millisecondsSinceEpoch;
+  print("🎙 [Mic Start] $micStartTime ms");
+  log?.micStart = DateTime.now();
+
+  await Future.delayed(listenFor);
+  await stop();
+}
+
 
   @override
   Future<void> stop() async {

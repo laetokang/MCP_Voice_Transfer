@@ -7,11 +7,9 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:whisper_flutter_new/whisper_flutter_new.dart';
 import 'stt_interface.dart';
-import 'package:voicetransfer/utils/log_timestamps.dart';
 
 class SttServiceWhisper implements SttInterface {
-  final LogTimestamps? log;
-  SttServiceWhisper({this.log});
+  SttServiceWhisper();
   Whisper? whisper;
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   final List<int> _audioBuffer = [];
@@ -79,7 +77,6 @@ void listen({
       // 🧠 추론 시작 시간
       final int inferenceStartTime = DateTime.now().millisecondsSinceEpoch;
       print("🧠 [Inference Start] $inferenceStartTime ms");
-      log?.inferenceStart = DateTime.now();
 
       try {
         final result = await whisper!.transcribe(
@@ -94,11 +91,7 @@ void listen({
         // ✅ 추론 완료 시간 및 전체 소요 시간
         final int inferenceEndTime = DateTime.now().millisecondsSinceEpoch;
         print("✅ [Inference Done] $inferenceEndTime ms (+${inferenceEndTime - inferenceStartTime}ms)");
-        print("⏱️ Total STT duration: ${inferenceEndTime - log!.micStart!.millisecondsSinceEpoch}ms");
-
-        log?.inferenceEnd = DateTime.now();
-        log?.printAll();
-
+        
         print("📜 Whisper 결과: ${result.text}");
         onResult(result.text, true);
       } catch (e) {
@@ -118,7 +111,6 @@ void listen({
   // 🎙 마이크 시작 시간 기록
   final int micStartTime = DateTime.now().millisecondsSinceEpoch;
   print("🎙 [Mic Start] $micStartTime ms");
-  log?.micStart = DateTime.now();
 
   await Future.delayed(listenFor);
   await stop();
@@ -129,7 +121,6 @@ void listen({
   Future<void> stop() async {
     _isRecording = false;
     await _recorder.stopRecorder();
-    log?.wavWrite = DateTime.now();
     await _audioStreamSub?.cancel();
     _audioBuffer.clear();
   }

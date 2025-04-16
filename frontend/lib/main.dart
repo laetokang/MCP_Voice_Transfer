@@ -8,11 +8,12 @@ import 'package:voicetransfer/features/stt/stt_service.dart';
 import 'package:voicetransfer/features/stt/stt_controller.dart';
 import 'package:voicetransfer/features/nlu/nlu_preprocessor.dart';
 import 'package:voicetransfer/features/nlu/nlu_service.dart';
+import 'package:voicetransfer/features/stt/stt_service_whisper.dart';
 
-final int appStartTime = DateTime.now().millisecondsSinceEpoch;
-print("🟢 [App Start] $appStartTime ms");
 
 void main() {
+final int appStartTime = DateTime.now().millisecondsSinceEpoch;
+print("🟢 [App Start] $appStartTime ms");
   runApp(const MyApp());
 }
 
@@ -24,6 +25,7 @@ void _requestPermission() async {
 }
 
 class MyApp extends StatelessWidget {
+  
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
@@ -46,6 +48,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  
   late final SttController _sttController;
   final ScrollController _scrollController = ScrollController();
   final List<Map<String, String>> messages = [
@@ -88,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState: setState,
       scrollToBottom: _scrollToBottom,
       autoSend: () => autoSend,
+      customService: SttServiceWhisper(),
     );
   }
 

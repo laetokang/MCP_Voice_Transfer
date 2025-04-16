@@ -35,32 +35,36 @@ class SttController {
     isListening = true;
 
     _sttService.listen(
-      onResult: (text, isFinal) {
-        setState(() {
-          textController.text = text;
-          textController.selection = TextSelection.fromPosition(
-            TextPosition(offset: text.length),
-          );
+  onResult: (text, isFinal) {
+    final int screenRenderTime = DateTime.now().millisecondsSinceEpoch;
+    print("📱 [Screen Output] $screenRenderTime ms");
+
+    setState(() {
+      textController.text = text;
+      textController.selection = TextSelection.fromPosition(
+        TextPosition(offset: text.length),
+      );
+    });
+
+    if (isFinal) {
+      stopListening();
+
+      if (autoSend()) {
+        onSubmit(text);
+        textController.clear();
+
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (autoSend()) startListening();
         });
+      } else {
+        onUserMessage(text); // 🔥 View에서 메시지 처리하도록 위임
+        textController.clear();
+        scrollToBottom();
+      }
+    }
+  },
+);
 
-        if (isFinal) {
-          stopListening();
-
-          if (autoSend()) {
-            onSubmit(text);
-            textController.clear();
-
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (autoSend()) startListening();
-            });
-          } else {
-            onUserMessage(text); // 🔥 View에서 메시지 처리하도록 위임
-            textController.clear();
-            scrollToBottom();
-          }
-        }
-      },
-    );
   }
 
   void stopListening() {

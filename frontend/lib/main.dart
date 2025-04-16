@@ -9,6 +9,9 @@ import 'package:voicetransfer/features/stt/stt_controller.dart';
 import 'package:voicetransfer/features/nlu/nlu_preprocessor.dart';
 import 'package:voicetransfer/features/nlu/nlu_service.dart';
 
+final int appStartTime = DateTime.now().millisecondsSinceEpoch;
+print("🟢 [App Start] $appStartTime ms");
+
 void main() {
   runApp(const MyApp());
 }

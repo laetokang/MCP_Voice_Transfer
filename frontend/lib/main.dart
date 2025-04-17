@@ -7,8 +7,10 @@ import 'package:voicetransfer/features/api/api.dart';
 import 'package:voicetransfer/features/stt/stt_controller.dart';
 import 'package:voicetransfer/features/nlu/nlu_preprocessor.dart';
 import 'package:voicetransfer/features/nlu/nlu_service.dart';
+import 'package:voicetransfer/features/stt/stt_service_whisper.dart';
 import 'package:voicetransfer/features/stt/stt_service_whisper_stream.dart';
 import 'package:voicetransfer/utils/timeLogger.dart';
+import 'package:voicetransfer/utils/deviceInfo.dart';
 
 void main() {
   timelineLogger.appStart = DateTime.now().millisecondsSinceEpoch;
@@ -19,6 +21,10 @@ void main() {
 // 마이크 권한 요청
 void _requestPermission() async {
   var status = await Permission.microphone.status;
+  var geoStatus = await Permission.location.status;
+  if (geoStatus.isDenied) {
+    await Permission.location.request();
+  }
   if (!status.isGranted) {
     await Permission.microphone.request();
   }
@@ -58,6 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _requestPermission(); // 퍼미션 요청
+    collectDeviceInfo();
     _sttController = SttController(
       onSubmit: (recognizedText) async {
         final cleanedText = postprocessText(recognizedText);
@@ -79,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState: setState,
       scrollToBottom: _scrollToBottom,
       autoSend: () => autoSend,
-      customService: SttServiceWhisperStream(),
+      customService: SttServiceWhisper(),
     );
   }
 

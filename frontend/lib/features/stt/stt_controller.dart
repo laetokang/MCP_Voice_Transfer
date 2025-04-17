@@ -1,7 +1,7 @@
 // STT 서비스와 Flutter UI 간 중재 역할
 import 'package:flutter/material.dart';
 import 'stt_interface.dart';
-import 'stt_service_whisper_stream.dart';
+import 'stt_service_whisper.dart';
 import 'package:voicetransfer/utils/timeLogger.dart';
 
 class SttController {
@@ -22,7 +22,7 @@ class SttController {
     required this.scrollToBottom,
     required this.autoSend,
     SttInterface? customService,
-  }) : _sttService = customService ?? SttServiceWhisperStream();
+  }) : _sttService = customService ?? SttServiceWhisper();
 
   Future<void> startListening() async {
     final available = await _sttService.initialize(
@@ -60,6 +60,8 @@ class SttController {
 
   void stopListening() {
     print("🛑 STT 중단 호출됨");
+    print(DateTime.now());
+    print(DateTime.now().millisecondsSinceEpoch);
     _sttService.stop();
     isListening = false;
   }

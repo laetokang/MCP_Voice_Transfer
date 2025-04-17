@@ -7,9 +7,10 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:whisper_flutter_new/whisper_flutter_new.dart';
 import 'stt_interface.dart';
+import 'package:voicetransfer/utils/timeLogger.dart';
 
-class SttServiceWhisper implements SttInterface {
-  SttServiceWhisper();
+class SttServiceWhisperStream implements SttInterface {
+  SttServiceWhisperStream();
   Whisper? whisper;
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   final List<int> _audioBuffer = [];
@@ -27,7 +28,7 @@ class SttServiceWhisper implements SttInterface {
     }
 
     whisper = Whisper(
-      model: WhisperModel.tiny,
+      model: WhisperModel.base,
       downloadHost: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main",
     );
     final version = await whisper!.getVersion();
@@ -41,42 +42,38 @@ class SttServiceWhisper implements SttInterface {
       onError("녹음 권한이 없거나 지원되지 않는 포맷입니다.");
       return false;
     }
-
     return true;
   }
 
   @override
-void listen({
-  required void Function(String text, bool isFinal) onResult,
-  Duration pauseFor = const Duration(seconds: 1),
-  Duration listenFor = const Duration(seconds: 5),
-  String localeId = 'ko_KR',
-}) async {
-  if (_isRecording) return;
-  _isRecording = true;
-  _audioBuffer.clear();
+  void listen({
+    required void Function(String text, bool isFinal) onResult,
+    Duration pauseFor = const Duration(seconds: 1),
+    Duration listenFor = const Duration(seconds: 2),
+    String localeId = 'ko_KR',
+  }) async {
+    if (_isRecording) return;
+    _isRecording = true;
+    _audioBuffer.clear();
 
-  final streamController = StreamController<Uint8List>();
+    final streamController = StreamController<Uint8List>();
+    _audioStreamSub = streamController.stream.listen((buffer) {
+      _audioBuffer.addAll(buffer);
+    });
 
-  // 1. 스트림 리스너 등록
-  streamController.stream.listen((buffer) async {
-    _audioBuffer.addAll(buffer);
+    // 🧠 2초마다 버퍼 복사해서 Whisper 추론하는 Timer
+    Timer? periodicTimer = Timer.periodic(Duration(seconds: 2), (_) async {
+      if (_audioBuffer.isEmpty || !_isRecording) return;
 
-    if (_audioBuffer.length >= 16000 * 2 * 2) {
+      final currentBuffer = List<int>.from(_audioBuffer); // 복사
+      _audioBuffer.clear(); // 🔁 혹은 일부만 제거해도 됨
+
       final dir = await getApplicationDocumentsDirectory();
-      final filePath = '${dir.path}/streamed_audio.wav';
+      final filePath = '${dir.path}/partial.wav';
       final file = File(filePath);
+      await _writeWavFile(Uint8List.fromList(currentBuffer), file.path);
 
-      // 💾 WAV 저장 시간 기록
-      await _writeWavFile(Uint8List.fromList(_audioBuffer), file.path);
-      final int wavSaveTime = DateTime.now().millisecondsSinceEpoch;
-      print("💾 [WAV Saved] $wavSaveTime ms");
-
-      _audioBuffer.clear();
-
-      // 🧠 추론 시작 시간
-      final int inferenceStartTime = DateTime.now().millisecondsSinceEpoch;
-      print("🧠 [Inference Start] $inferenceStartTime ms");
+      print("📤 Whisper에 보낼 오디오 길이: ${currentBuffer.length}");
 
       try {
         final result = await whisper!.transcribe(
@@ -87,35 +84,51 @@ void listen({
             splitOnWord: true,
           ),
         );
-
-        // ✅ 추론 완료 시간 및 전체 소요 시간
-        final int inferenceEndTime = DateTime.now().millisecondsSinceEpoch;
-        print("✅ [Inference Done] $inferenceEndTime ms (+${inferenceEndTime - inferenceStartTime}ms)");
-        
-        print("📜 Whisper 결과: ${result.text}");
-        onResult(result.text, true);
+        onResult(result.text, false); // 실시간 스트리밍 느낌
       } catch (e) {
         print("❌ Whisper 오류: $e");
       }
-    }
-  });
+    });
 
-  // 2. Recorder 시작
-  await _recorder.startRecorder(
-    codec: Codec.pcm16,
-    sampleRate: 16000,
-    numChannels: 1,
-    toStream: streamController.sink,
-  );
+    await _recorder.startRecorder(
+      codec: Codec.pcm16,
+      sampleRate: 16000,
+      numChannels: 1,
+      toStream: streamController.sink,
+    );
 
-  // 🎙 마이크 시작 시간 기록
-  final int micStartTime = DateTime.now().millisecondsSinceEpoch;
-  print("🎙 [Mic Start] $micStartTime ms");
+    timelineLogger.micStart = DateTime.now().millisecondsSinceEpoch;
 
-  await Future.delayed(listenFor);
-  await stop();
-}
+    // 🎯 일정 시간 후 종료
+    Future.delayed(listenFor, () async {
+      await stop();
+      periodicTimer.cancel();
 
+      if (_audioBuffer.isNotEmpty) {
+        final finalBuffer = List<int>.from(_audioBuffer);
+        final dir = await getApplicationDocumentsDirectory();
+        final filePath = '${dir.path}/final.wav';
+        await _writeWavFile(Uint8List.fromList(finalBuffer), filePath);
+
+        try {
+          final result = await whisper!.transcribe(
+            transcribeRequest: TranscribeRequest(
+              audio: filePath,
+              isTranslate: false,
+              isNoTimestamps: true,
+              splitOnWord: true,
+            ),
+          );
+          onResult(result.text, true); // ✅ 마지막은 isFinal = true
+        } catch (e) {
+          print("❌ 최종 Whisper 오류: $e");
+        }
+      }
+      ;
+
+      periodicTimer.cancel();
+    });
+  }
 
   @override
   Future<void> stop() async {

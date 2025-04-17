@@ -1,22 +1,22 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:voicetransfer/features/stt/stt_service.dart';
+import 'package:voicetransfer/features/api/api.dart';
 import 'package:voicetransfer/features/stt/stt_controller.dart';
 import 'package:voicetransfer/features/nlu/nlu_preprocessor.dart';
 import 'package:voicetransfer/features/nlu/nlu_service.dart';
-import 'package:voicetransfer/features/stt/stt_service_whisper.dart';
-
+import 'package:voicetransfer/features/stt/stt_service_whisper_stream.dart';
+import 'package:voicetransfer/utils/timeLogger.dart';
 
 void main() {
-final int appStartTime = DateTime.now().millisecondsSinceEpoch;
-print("🟢 [App Start] $appStartTime ms");
+  timelineLogger.appStart = DateTime.now().millisecondsSinceEpoch;
+  print("🟢 [App Start] ${timelineLogger.appStart} ms");
   runApp(const MyApp());
 }
 
+// 마이크 권한 요청
 void _requestPermission() async {
   var status = await Permission.microphone.status;
   if (!status.isGranted) {
@@ -25,7 +25,6 @@ void _requestPermission() async {
 }
 
 class MyApp extends StatelessWidget {
-  
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
@@ -48,7 +47,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  
   late final SttController _sttController;
   final ScrollController _scrollController = ScrollController();
   final List<Map<String, String>> messages = [
@@ -61,26 +59,16 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _requestPermission(); // 퍼미션 요청
     _sttController = SttController(
-      textController: _textController,
       onSubmit: (recognizedText) async {
+        final cleanedText = postprocessText(recognizedText);
+        final result = await NluService.analyze(cleanedText);
         setState(() {
           messages.add({"text": recognizedText, "type": "user"});
           messages.add({"text": "", "type": "system"});
-          _scrollToBottom();
-        });
-        final cleanedText = postprocessText(recognizedText);
-
-        // ✅ NLU 분석 요청
-        final result = await NluService.analyze(cleanedText);
-
-        // 예시: { intent: '송금', slots: { to: '엄마', amount: 10000 } }
-        print("🎯 분석 결과: ${result.intent}, ${result.slots}");
-        setState(() {
-          messages.add({
-            "text": "🎯 분석 결과: ${result.intent}, ${result.slots}",
-            "type": "system",
-          });
-          _scrollToBottom();
+          // messages.add({
+          //   "text": "🎯 분석 결과: ${result.intent}, ${result.slots}",
+          //   "type": "system",
+          // });
         });
       },
       onUserMessage: (text) {
@@ -91,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState: setState,
       scrollToBottom: _scrollToBottom,
       autoSend: () => autoSend,
-      customService: SttServiceWhisper(),
+      customService: SttServiceWhisperStream(),
     );
   }
 
@@ -114,93 +102,26 @@ class _MyHomePageState extends State<MyHomePage> {
       _scrollToBottom();
     });
 
-    final chatHistory =
-        messages.map((msg) {
-          return {
-            "role": msg["type"] == "user" ? "user" : "assistant",
-            "content": msg["text"]!,
-          };
-        }).toList();
+    final chatbotIndex = messages.length - 1;
 
-    final request = http.Request(
-      "POST",
-      Uri.parse("https://api.openai.com/v1/chat/completions"),
-    );
-    request.headers.addAll({
-      'Authorization': 'Bearer YOUR_API_KEY_HERE', // 🔐 OpenAI API 키 넣기!
-      'Content-Type': 'application/json',
-    });
-
-    request.body = jsonEncode({
-      "model": "gpt-3.5-turbo",
-      "messages": chatHistory,
-      "temperature": 0.7,
-      "max_tokens": 500,
-      "stream": true,
-    });
-
-    try {
-      final response = await request.send();
-      if (response.statusCode == 200) {
-        String replyText = "";
-        int chatbotIndex = messages.length - 1;
-
-        response.stream
-            .transform(utf8.decoder)
-            .listen(
-              (chunk) {
-                final lines = chunk.split("\n");
-                for (var line in lines) {
-                  if (line.startsWith("data:")) {
-                    String jsonStr = line.substring(5).trim();
-                    if (jsonStr.isNotEmpty && jsonStr != "[DONE]") {
-                      try {
-                        final jsonData = jsonDecode(jsonStr);
-                        final delta =
-                            jsonData['choices'][0]['delta']['content']
-                                as String?;
-                        if (delta != null) {
-                          replyText += delta;
-                          setState(() {
-                            messages[chatbotIndex] = {
-                              "text": replyText,
-                              "type": "system",
-                            };
-                          });
-                          _scrollToBottom();
-                        }
-                      } catch (e) {
-                        log("JSON 파싱 오류: $e");
-                      }
-                    }
-                  }
-                }
-              },
-              onError: (error) {
-                setState(() {
-                  messages[chatbotIndex] = {
-                    "text": "네트워크 오류 발생: $error",
-                    "type": "system",
-                  };
-                });
-              },
-            );
-      } else {
+    await ChatApi(
+      messages: messages,
+      onPartialResponse: (replyText) {
         setState(() {
-          messages.last = {
-            "text": "Error: ${response.statusCode}",
-            "type": "system",
-          };
+          messages[chatbotIndex] = {"text": replyText, "type": "system"};
         });
-      }
-    } catch (e) {
-      setState(() {
-        messages.last = {"text": "네트워크 오류 발생: $e", "type": "system"};
-      });
-    }
+        _scrollToBottom();
+      },
+      onError: (errorMsg) {
+        setState(() {
+          messages[chatbotIndex] = {"text": errorMsg, "type": "system"};
+        });
+      },
+    );
   }
 
   bool autoSend = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

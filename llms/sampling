@@ -1,0 +1,102 @@
+[
+  {
+    "text": "철수한테 오천 원 보내줘",
+    "intent": "송금",
+    "slots": { "recipient": "철수", "amount": 5000 }
+  },
+  {
+    "text": "엄마한테 3만원만",
+    "intent": "송금",
+    "slots": { "recipient": "엄마", "amount": 30000 }
+  },
+  {
+    "text": "만원만 보내줘",
+    "intent": "송금",
+    "slots": { "recipient": None, "amount": 10000 }
+  },
+  {
+    "text": "엄마한테 보내줘",
+    "intent": "송금",
+    "slots": { "recipient": "엄마", "amount": None }
+  },
+  {
+    "text": "나 송금하고 싶어",
+    "intent": "송금",
+    "slots": { "recipient": None, "amount": None }
+  },
+  {
+    "text": "가스비 내야 하는데 어떻게 해야 해?",
+    "intent": "질문",
+    "slots": { "topic": "가스비" }
+  },
+  {
+    "text": "내 계좌에 얼마 남았어?",
+    "intent": "질문",
+    "slots": { "topic": "잔액조회" }
+  },
+  {
+    "text": "그 사람한테 또 보내줘",
+    "intent": "송금",
+    "slots": { "recipient": "이전대화", "amount": "이전대화" }
+  },
+  {
+    "text": "아까랑 똑같이 보내줘",
+    "intent": "송금",
+    "slots": { "recipient": "이전대화", "amount": "이전대화" }
+  },
+  {
+    "text": "송금할래",
+    "intent": "송금",
+    "slots": { "recipient": None, "amount": None }
+  },
+  {
+    "text": "이체 수수료 얼마야?",
+    "intent": "질문",
+    "slots": { "topic": "이체 수수료" }
+  },
+  {
+    "text": "오늘 아빠랑 점심 먹었어",
+    "intent": "기타",
+    "slots": {}
+  },
+  {
+    "text": "아빠한테 이만원 보내줘",
+    "intent": "송금",
+    "slots": { "recipient": "아빠", "amount": 20000 }
+  },
+  {
+    "text": "여보한테 십만 원 이체해줘",
+    "intent": "송금",
+    "slots": { "recipient": "여보", "amount": 100000 }
+  },
+  {
+    "text": "보내지 마",
+    "intent": "취소",
+    "slots": {}
+  },
+  {
+    "text": "그냥 넘어가줘",
+    "intent": "취소",
+    "slots": {}
+  },
+  {
+    "text": "엄마 송금해줘",
+    "intent": "송금",
+    "slots": { "recipient": "엄마", "amount": None }
+  },
+  {
+    "text": "아, 삼만원 보내는 거였지",
+    "intent": "확인",
+    "slots": { "amount": 30000 }
+  },
+  {
+    "text": "예금해줘",
+    "intent": "기타",
+    "slots": { "action": "예금" }
+  },
+  {
+    "text": "누구한테 보낼까요?",
+    "intent": "시스템응답",
+    "slots": {}
+  }
+]

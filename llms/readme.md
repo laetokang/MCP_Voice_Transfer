@@ -1,3 +1,10 @@
+```
+nlp_base : intent 및 간단한 response 반환 가능
+result: prompt_a 테스트 결과 값
+result1: prompt_b 테스트 결과 값
+sampling : 정답 데이터 set, 단 reponse 생성 X, 이후 추가 예정
+```
+
 ## 🔧 **단계별 개발 방향성**
 
 ### 🔹 1단계: **단일 경량 모델 기반 MVP 구조 정착**

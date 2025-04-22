@@ -5,9 +5,10 @@ import 'dart:typed_data';
 
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:whisper_flutter_new/whisper_flutter_new.dart';
-import 'stt_interface.dart';
-import 'package:voicetransfer/utils/timeLogger.dart';
+// import 'package:whisper_flutter_new/whisper_flutter_new.dart';
+import "../stt/whisper_flutter_new.dart";
+import '../../../domain/interfaces/stt_interface.dart';
+import 'package:voicetransfer/core/utils/timeLogger.dart';
 
 class SttServiceWhisperStream implements SttInterface {
   SttServiceWhisperStream();
@@ -28,7 +29,7 @@ class SttServiceWhisperStream implements SttInterface {
     }
 
     whisper = Whisper(
-      model: WhisperModel.base,
+      model: WhisperModel.baseQ8_0,
       downloadHost: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main",
     );
     final version = await whisper!.getVersion();
@@ -46,11 +47,12 @@ class SttServiceWhisperStream implements SttInterface {
   }
 
   @override
-  void listen({
+  Future<void> listen({
     required void Function(String text, bool isFinal) onResult,
     Duration pauseFor = const Duration(seconds: 1),
     Duration listenFor = const Duration(seconds: 2),
     String localeId = 'ko_KR',
+    void Function(String status)? onStatus,
   }) async {
     if (_isRecording) return;
     _isRecording = true;

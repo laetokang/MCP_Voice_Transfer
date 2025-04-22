@@ -8,7 +8,8 @@
 import "dart:convert";
 
 import "package:freezed_annotation/freezed_annotation.dart";
-import "package:whisper_flutter_new/bean/whisper_dto.dart";
+
+import "../whisper/whisper_dto.dart";
 
 part "request_bean.freezed.dart";
 part "request_bean.g.dart";
@@ -85,10 +86,7 @@ class TranscribeRequestDto
 
   @override
   String toRequestString() {
-    return json.encode({
-      "@type": specialType,
-      ...toJson(),
-    });
+    return json.encode({"@type": specialType, ...toJson()});
   }
 }
 
@@ -102,8 +100,6 @@ class VersionRequest with _$VersionRequest implements WhisperRequestDto {
 
   @override
   String toRequestString() {
-    return json.encode({
-      "@type": specialType,
-    });
+    return json.encode({"@type": specialType});
   }
 }

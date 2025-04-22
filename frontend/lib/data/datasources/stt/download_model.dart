@@ -17,9 +17,13 @@ enum WhisperModel {
 
   /// tiny model for all languages
   tiny("tiny"),
+  tinyQ5_1("tiny-q5_1"),
 
   /// base model for all languages
   base("base"),
+  baseQ8_0("base-q8_0"),
+  baseQ5_1("base-q5_1"),
+  smallQ8_0("small-q8_0"),
 
   /// small model for all languages
   small("small"),
@@ -43,10 +47,11 @@ enum WhisperModel {
 }
 
 /// Download [model] to [destinationPath]
-Future<String> downloadModel(
-    {required WhisperModel model,
-    required String destinationPath,
-    String? downloadHost}) async {
+Future<String> downloadModel({
+  required WhisperModel model,
+  required String destinationPath,
+  String? downloadHost,
+}) async {
   if (kDebugMode) {
     debugPrint("Download model ${model.modelName}");
   }
@@ -60,14 +65,10 @@ Future<String> downloadModel(
       "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-${model.modelName}.bin",
     );
   } else {
-    modelUri = Uri.parse(
-      "$downloadHost/ggml-${model.modelName}.bin",
-    );
+    modelUri = Uri.parse("$downloadHost/ggml-${model.modelName}.bin");
   }
 
-  final request = await httpClient.getUrl(
-    modelUri,
-  );
+  final request = await httpClient.getUrl(modelUri);
 
   final response = await request.close();
 

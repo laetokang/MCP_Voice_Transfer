@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
-import 'package:whisper_flutter_new/whisper_flutter_new.dart';
-import 'stt_interface.dart';
+import '../stt/whisper_flutter_new.dart';
+import '../../../domain/interfaces/stt_interface.dart';
 
 class SttServiceWhisper implements SttInterface {
   Whisper? whisper;
@@ -14,13 +14,14 @@ class SttServiceWhisper implements SttInterface {
     required void Function(String status) onStatus,
     required void Function(String error) onError,
   }) async {
+    onStatus("initializing");
     if (whisper != null) {
       onStatus("already initialized");
       return true;
     }
 
     whisper = Whisper(
-      model: WhisperModel.base,
+      model: WhisperModel.baseQ8_0,
       downloadHost: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main",
     );
     final version = await whisper!.getVersion();
@@ -36,11 +37,12 @@ class SttServiceWhisper implements SttInterface {
   }
 
   @override
-  void listen({
+  Future<void> listen({
     required void Function(String text, bool isFinal) onResult,
     Duration pauseFor = const Duration(seconds: 5),
     Duration listenFor = const Duration(seconds: 5),
     String localeId = 'ko_KR',
+    void Function(String status)? onStatus,
   }) async {
     final Directory dir = await getApplicationDocumentsDirectory();
     final String filePath = '${dir.path}/recorded.wav';
@@ -49,7 +51,7 @@ class SttServiceWhisper implements SttInterface {
     if (await File(filePath).exists()) {
       await File(filePath).delete();
     }
-
+    onStatus?.call("recording");
     // 🎙️ 녹음 시작
     await _recorder.start(
       const RecordConfig(
@@ -69,7 +71,7 @@ class SttServiceWhisper implements SttInterface {
     if (recordedPath == null || !File(recordedPath).existsSync()) {
       throw Exception("❌ 녹음된 파일이 존재하지 않습니다.");
     }
-
+    onStatus?.call("transcribing");
     final transcription = await whisper!.transcribe(
       transcribeRequest: TranscribeRequest(
         audio: recordedPath,
@@ -81,6 +83,7 @@ class SttServiceWhisper implements SttInterface {
 
     print("📜 Whisper 결과: ${transcription.text}");
     onResult(transcription.text, true);
+    onStatus?.call("unloading");
   }
 
   @override

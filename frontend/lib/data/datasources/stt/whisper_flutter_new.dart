@@ -1,11 +1,3 @@
-/*
- * Copyright (c) 田梓萱[小草林] 2021-2024.
- * All Rights Reserved.
- * All codes are protected by China's regulations on the protection of computer software, and infringement must be investigated.
- * 版权所有 (c) 田梓萱[小草林] 2021-2024.
- * 所有代码均受中国《计算机软件保护条例》保护，侵权必究.
- */
-
 import "dart:convert";
 import "dart:ffi";
 import "dart:io";
@@ -14,13 +6,16 @@ import "dart:isolate";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
 import "package:path_provider/path_provider.dart";
-import "package:whisper_flutter_new/bean/_models.dart";
-import "package:whisper_flutter_new/bean/whisper_dto.dart";
-import "package:whisper_flutter_new/download_model.dart";
-import "package:whisper_flutter_new/whisper_bindings_generated.dart";
+import "../../models/whisper/_models.dart";
 
-export "package:whisper_flutter_new/bean/_models.dart";
-export "package:whisper_flutter_new/download_model.dart" show WhisperModel;
+// import "package:whisper_flutter_new/bean/whisper_dto.dart";
+import "../../models/whisper/whisper_dto.dart";
+import "../stt/download_model.dart" show WhisperModel, downloadModel;
+// import "package:whisper_flutter_new/whisper_bindings_generated.dart";
+import "../stt/whisper_bindings_generated.dart";
+
+export "../../models/whisper/_models.dart";
+export "../stt/download_model.dart" show WhisperModel;
 
 /// Entry point of whisper_flutter_plus
 class Whisper {
@@ -50,9 +45,10 @@ class Whisper {
     if (modelDir != null) {
       return modelDir!;
     }
-    final Directory libraryDirectory = Platform.isAndroid
-        ? await getApplicationSupportDirectory()
-        : await getLibraryDirectory();
+    final Directory libraryDirectory =
+        Platform.isAndroid
+            ? await getApplicationSupportDirectory()
+            : await getLibraryDirectory();
     return libraryDirectory.path;
   }
 
@@ -67,7 +63,10 @@ class Whisper {
       return;
     } else {
       await downloadModel(
-          model: model, destinationPath: modelDir, downloadHost: downloadHost);
+        model: model,
+        destinationPath: modelDir,
+        downloadHost: downloadHost,
+      );
     }
   }
 
@@ -77,25 +76,23 @@ class Whisper {
     if (model != WhisperModel.none) {
       await _initModel();
     }
-    return Isolate.run(
-      () async {
-        final Pointer<Utf8> data =
-            whisperRequest.toRequestString().toNativeUtf8();
-        final Pointer<Char> res =
-            WhisperFlutterBindings(_openLib()).request(data.cast<Char>());
-        final Map<String, dynamic> result = json.decode(
-          res.cast<Utf8>().toDartString(),
-        ) as Map<String, dynamic>;
-        try {
-          malloc.free(data);
-          malloc.free(res);
-        } catch (_) {}
-        if (kDebugMode) {
-          debugPrint("Result =  $result");
-        }
-        return result;
-      },
-    );
+    return Isolate.run(() async {
+      final Pointer<Utf8> data =
+          whisperRequest.toRequestString().toNativeUtf8();
+      final Pointer<Char> res = WhisperFlutterBindings(
+        _openLib(),
+      ).request(data.cast<Char>());
+      final Map<String, dynamic> result =
+          json.decode(res.cast<Utf8>().toDartString()) as Map<String, dynamic>;
+      try {
+        malloc.free(data);
+        malloc.free(res);
+      } catch (_) {}
+      if (kDebugMode) {
+        debugPrint("Result =  $result");
+      }
+      return result;
+    });
   }
 
   /// Transcribe audio file to text

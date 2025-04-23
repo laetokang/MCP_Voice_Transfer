@@ -1,8 +1,8 @@
-name: voicetransfer
+name: ios
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.0
+  sdk: ^3.7.2
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -34,27 +34,10 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  speech_to_text: ^7.0.0
-  http: ^1.3.0
-  permission_handler: ^12.0.0
-  riverpod: ^2.6.1
-  flutter_sound: ^9.28.0
-  record: ^6.0.0
-  device_info_plus: ^11.3.3
-  package_info_plus: ^8.3.0
-  geolocator: ^14.0.0
-  shared_preferences: ^2.5.3
-  root_checker_plus: ^0.0.4
-  flutter_riverpod: ^2.6.1
-  freezed_annotation: ^2.4.4
-  whisper_flutter_new: ^1.0.1
-  onnxruntime: ^1.4.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  freezed: ^2.4.6
-  build_runner: ^2.4.8
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -68,13 +51,15 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
+  # assets:
+  #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

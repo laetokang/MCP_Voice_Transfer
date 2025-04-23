@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import '../stt/whisper_flutter_new.dart';
-import '../../../domain/interfaces/stt_interface.dart';
+import '../../../domain/repositories/stt_interface.dart';
 
 class SttServiceWhisper implements SttInterface {
   Whisper? whisper;

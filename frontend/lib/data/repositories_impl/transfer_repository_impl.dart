@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:voicetransfer/data/models/transfer_request_model.dart';
 import 'package:voicetransfer/domain/entities/transfer.dart';
-import 'package:voicetransfer/domain/repositories/transfer_repository.dart';
+import 'package:voicetransfer/domain/repositories/transfer_interface.dart';
 
 class TransferRepositoryImpl implements TransferRepository {
   @override

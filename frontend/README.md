@@ -9,63 +9,101 @@ Flutter 기반 음성 송금 인터페이스 시스템입니다.
 
 ### 🎯 구성 원칙
 
-- Clean Architecture 기반
-- Feature-first modular 구조
-- View ↔ Controller ↔ Service 계층 분리
-- 추상화(`Interface`) 기반으로 유연한 구현체 교체 가능
+- Clean Architecture + MVVM 기반
+
+```
+[UI 페이지]
+    ↓             (provider 통해 연결)
+[SttViewModel]
+    ↓             (도메인 유스케이스 실행)
+[ListenAndTranscribe]
+    ↓             (인터페이스 의존성)
+[SttInterface]
+    ↓             (실제 구현체 - Whisper 등)
+[SttServiceWhisper]
+```
 
 ---
-
-### 🔁 전체 흐름 요약
-
-```plaintext
-사용자 음성 입력
-    ↓
-[features/stt]         : 음성 → 텍스트 변환
-    ↓
-[features/nlu]         : 의도(Intent), 슬롯(Slot) 추출
-    ↓
-[features/dialog]      : 대화 상태 관리, 슬롯 채움
-    ↓
-[features/voice_auth]  : 화자 인증 여부 판단 (Voiceprint 비교 등)
-    ↓
-[features/tts]         : 응답 텍스트를 음성으로 변환 (TTS)
-```
 
 ### ✅ 2. 폴더 구조
 
 ```
 lib/
-├── features/
-│   ├── stt/                    # STT 기능 (음성 인식)
-│   │   ├── stt_interface.dart
-│   │   ├── stt_service.dart
-│   │   └── stt_controller.dart
-│
-│   ├── nlu/                    # 자연어 이해 (의도 및 슬롯 분석)
-│   │   ├── nlu_model.dart
-│   │   └── nlu_service.dart
-│
-│   ├── dialog/                 # 대화 흐름 관리 (DM)
-│   │   ├── dialog_manager.dart
-│   │   └── slot_filler.dart
-│
-│   ├── voice_auth/             # 화자 인증 모듈
-│   │   ├── voice_auth_interface.dart
-│   │   ├── voice_auth_service.dart
-│   │   └── voice_auth_controller.dart
-│
-│   ├── tts/                    # TTS 기능 (음성 응답)
-│   │   └── tts_service.dart
-│
-└── main.dart                   # 앱 진입점 (UI 및 Controller 연결)
+├── core/                  # 공통 유틸리티 (API 설정, 시간 기록 등)
+├── data/                  # 외부 통신, 모델 구현 등
+│   └── datasources/
+│       └── stt/
+│           ├── stt_service.dart              # STT 추상 클래스(인터페이스)
+│           ├── stt_service_whisper.dart      # Whisper 기반 STT 구현
+│           ├── stt_service_whisper_stream.dart
+├── domain/                # 비즈니스 로직 계층
+│   ├── interfaces/        # STT 등 인터페이스 정의
+│   └── usecases/          # 실제 사용 케이스 정의
+├── presentation/          # ViewModel, UI 상태관리
+│   ├── viewmodels/
+│   ├── providers/
+│   └── pages/
+└── main.dart              # 앱 진입점
+
 ```
 
-## 📂 사용 방법
+## 📂 3. 사용 방법
+
+1. Flutter 환경 구성: flutter doctor로 기본 셋업 확인
+
+```bash
+flutter doctor
+```
+
+2. pubspec.yaml에 의존성 확인 후:
 
 ```bash
 flutter pub get
 flutter run
+```
+
+## 📂 4. STT 방식 교체 방법
+
+- frontend/lib/presentation/providers/stt_provider.dart 내
+
+```
+final sttViewModelProvider = ChangeNotifierProvider<SttViewModel>((ref) {
+  //(1)Google API : SttService (2)Whisper API : SttServiceWhisper로 고치기
+  final useCase = ListenAndTranscribe(SttServiceWhisper());
+  return SttViewModel(useCase);
+});
+```
+
+(1) Google API
+
+```
+final sttViewModelProvider = ChangeNotifierProvider<SttViewModel>((ref) {
+  //(1)Google API : SttService (2)Whisper API : SttServiceWhisper로 고치기
+  final useCase = ListenAndTranscribe(SttService());
+  return SttViewModel(useCase);
+});
+```
+
+(2) Whisper 배치 처리 구현
+
+```
+final sttViewModelProvider = ChangeNotifierProvider<SttViewModel>((ref) {
+  //(1)Google API : SttService (2)Whisper API : SttServiceWhisper로 고치기
+  final useCase = ListenAndTranscribe(SttServiceWhisper());
+  return SttViewModel(useCase);
+});
+```
+
+## 📂 5. Whisper 모델 교체 방법(현재 baseQ8_0)
+
+- frontend/lib/data/datasources/stt/stt_service_whisper.dart 내
+
+```
+ whisper = Whisper(
+      // 하단에 WhisperModel.어쩌고로 바꾸기
+      model: WhisperModel.baseQ8_0,
+      downloadHost: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main",
+);
 ```
 
 ## 📞 문의 및 기여

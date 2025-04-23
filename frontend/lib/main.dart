@@ -1,21 +1,70 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:voicetransfer/features/api/api.dart';
-import 'package:voicetransfer/features/stt/stt_controller.dart';
-import 'package:voicetransfer/features/nlu/nlu_preprocessor.dart';
-import 'package:voicetransfer/features/nlu/nlu_service.dart';
-import 'package:voicetransfer/features/stt/stt_service_whisper.dart';
-import 'package:voicetransfer/features/stt/stt_service_whisper_stream.dart';
-import 'package:voicetransfer/utils/timeLogger.dart';
-import 'package:voicetransfer/utils/deviceInfo.dart';
+import 'package:voicetransfer/core/network/api.dart';
+import 'package:voicetransfer/data/datasources/nlu/nlu_service.dart';
+import 'package:voicetransfer/data/datasources/nlu/nlu_preprocessor.dart';
+
+import 'package:voicetransfer/core/utils/timeLogger.dart';
+import 'package:voicetransfer/presentation/providers/stt_provider.dart';
+import 'package:voicetransfer/presentation/viewmodels/stt_viewmodel.dart';
+// import 'package:voicetransfer/utils/deviceInfo.dart';
 
 void main() {
   timelineLogger.appStart = DateTime.now().millisecondsSinceEpoch;
   print("🟢 [App Start] ${timelineLogger.appStart} ms");
-  runApp(const MyApp());
+  runApp(
+    ProviderScope(
+      // 👈 Riverpod 상태 관리 범위
+      child: MyApp(),
+    ),
+  );
+}
+
+String getStateText(
+  SttUiState state,
+  int timestamp,
+  int? previousTimestamp,
+  int? now,
+) {
+  final current = now ?? DateTime.now().millisecondsSinceEpoch;
+  final elapsed = current - timestamp;
+  final sinceLast =
+      previousTimestamp != null ? timestamp - previousTimestamp : null;
+
+  String label;
+  switch (state) {
+    case SttUiState.downloadingModel:
+      label = "📥 모델 다운로드 중...";
+      break;
+    case SttUiState.initializingModel:
+      label = "🔧 모델 초기화 중...";
+      break;
+    case SttUiState.recording:
+      label = "🎙️ 마이크 녹음 중...";
+      break;
+    case SttUiState.transcribing:
+      label = "🧠 추론 중...";
+      break;
+    case SttUiState.unloadingModel:
+      label = "📤 모델 언로딩 중...";
+      break;
+    case SttUiState.error:
+      label = "❌ 오류 발생!";
+      break;
+    default:
+      label = "";
+  }
+  if (state != SttUiState.idle) {
+    label += " (${elapsed}ms 경과";
+    if (sinceLast != null) {
+      label += ", 이전 상태로부터 +${sinceLast}ms)";
+    } else {
+      label += ")";
+    }
+  }
+
+  return label;
 }
 
 // 마이크 권한 요청
@@ -44,50 +93,37 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key, required this.title});
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  late final SttController _sttController;
+class _MyHomePageState extends ConsumerState<MyHomePage> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _textController = TextEditingController();
   final List<Map<String, String>> messages = [
     {"text": "안녕하세요. 김선민님!\n오늘은 무엇을 도와드릴까요?", "type": "system"},
   ];
-  final TextEditingController _textController = TextEditingController();
+
+  bool autoSend = false;
+
+  late final ProviderSubscription<SttViewModel> _listener;
 
   @override
   void initState() {
     super.initState();
-    _requestPermission(); // 퍼미션 요청
-    collectDeviceInfo();
-    _sttController = SttController(
-      onSubmit: (recognizedText) async {
-        final cleanedText = postprocessText(recognizedText);
-        final result = await NluService.analyze(cleanedText);
-        setState(() {
-          messages.add({"text": recognizedText, "type": "user"});
-          messages.add({"text": "", "type": "system"});
-          // messages.add({
-          //   "text": "🎯 분석 결과: ${result.intent}, ${result.slots}",
-          //   "type": "system",
-          // });
-        });
-      },
-      onUserMessage: (text) {
-        setState(() {
-          messages.add({"text": text, "type": "user"});
-        });
-      },
-      setState: setState,
-      scrollToBottom: _scrollToBottom,
-      autoSend: () => autoSend,
-      customService: SttServiceWhisper(),
-    );
+    _requestPermission();
+  }
+
+  @override
+  void dispose() {
+    _listener.close();
+    _scrollController.dispose();
+    _textController.dispose();
+    super.dispose();
   }
 
   void _scrollToBottom() {
@@ -127,10 +163,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  bool autoSend = false;
-
   @override
   Widget build(BuildContext context) {
+    final sttViewModel = ref.watch(sttViewModelProvider);
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Column(
@@ -145,18 +181,44 @@ class _MyHomePageState extends State<MyHomePage> {
                   SwitchListTile(
                     title: Text("음성 인식 후 자동 전송"),
                     value: autoSend,
-                    onChanged: (value) {
+                    onChanged: (value) async {
                       setState(() {
                         autoSend = value;
                       });
                       if (value) {
-                        _sttController.startListening();
+                        await sttViewModel.startListening();
+
+                        if (sttViewModel.resultText.isNotEmpty) {
+                          if (autoSend) {
+                            _handleSubmitted(
+                              sttViewModel.resultText,
+                            ); // 자동 전송도 같이!
+                          }
+                        }
                       } else {
-                        _sttController
-                            .stopListening(); // 꺼졌을 땐 STT 중지도 추가해도 좋아요
+                        sttViewModel.stopListening(); // 꺼졌을 땐 STT 중지도 추가해도 좋아요
                       }
                     },
                   ),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final sttViewModel = ref.watch(sttViewModelProvider);
+                      final now = DateTime.now().millisecondsSinceEpoch;
+                      return Text(
+                        getStateText(
+                          sttViewModel.state,
+                          sttViewModel.stateChangedAt,
+                          sttViewModel.previousStateChangedAt,
+                          now,
+                        ),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      );
+                    },
+                  ),
+
                   for (var message in messages)
                     Align(
                       alignment:
@@ -188,8 +250,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-
-          // 하단 텍스트 입력창
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
             child: Container(

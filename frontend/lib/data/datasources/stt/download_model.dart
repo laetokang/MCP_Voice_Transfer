@@ -17,19 +17,47 @@ enum WhisperModel {
 
   /// tiny model for all languages
   tiny("tiny"),
+  tinyQ5_1("tiny-q5_1"),
+  tinyQ8_0("tiny-q8_0"),
+  tinyEn("tiny.en"),
+  tinyEnQ5_1("tiny.en-q5_1"),
+  tinyEnQ8_0("tiny.en-q8_0"),
 
   /// base model for all languages
   base("base"),
+  baseQ5_1("base-q5_1"),
+  baseQ8_0("base-q8_0"),
+  baseEn("base.en"),
+  baseEnQ5_1("base.en-q5_1"),
+  baseEnQ8_0("base.en-q8_0"),
 
   /// small model for all languages
   small("small"),
+  smallQ5_1("small-q5_1"),
+  smallQ8_0("small-q8_0"),
+  smallEn("small.en"),
+  smallEnQ5_1("small.en-q5_1"),
+  smallEnQ8_0("small.en-q8_0"),
+  smallEnTdrz("small.en-tdrz"),
 
   /// medium model for all languages
   medium("medium"),
+  mediumQ5_0("medium-q5_0"),
+  mediumQ8_0("medium-q8_0"),
+  mediumEn("medium.en"),
+  mediumEnQ5_0("medium.en-q5_0"),
+  mediumEnQ8_0("medium.en-q8_0"),
 
   /// large model for all languages
   largeV1("large-v1"),
-  largeV2("large-v2");
+  largeV2("large-v2"),
+  largeV2Q5_0("large-v2-q5_0"),
+  largeV2Q8_0("large-v2-q8_0"),
+  largeV3("large-v3"),
+  largeV3Q5_0("large-v3-q5_0"),
+  largeV3Turbo("large-v3-turbo"),
+  largeV3TurboQ5_0("large-v3-turbo-q5_0"),
+  largeV3TurboQ8_0("large-v3-turbo-q8_0");
 
   const WhisperModel(this.modelName);
 
@@ -43,10 +71,11 @@ enum WhisperModel {
 }
 
 /// Download [model] to [destinationPath]
-Future<String> downloadModel(
-    {required WhisperModel model,
-    required String destinationPath,
-    String? downloadHost}) async {
+Future<String> downloadModel({
+  required WhisperModel model,
+  required String destinationPath,
+  String? downloadHost,
+}) async {
   if (kDebugMode) {
     debugPrint("Download model ${model.modelName}");
   }
@@ -60,14 +89,10 @@ Future<String> downloadModel(
       "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-${model.modelName}.bin",
     );
   } else {
-    modelUri = Uri.parse(
-      "$downloadHost/ggml-${model.modelName}.bin",
-    );
+    modelUri = Uri.parse("$downloadHost/ggml-${model.modelName}.bin");
   }
 
-  final request = await httpClient.getUrl(
-    modelUri,
-  );
+  final request = await httpClient.getUrl(modelUri);
 
   final response = await request.close();
 

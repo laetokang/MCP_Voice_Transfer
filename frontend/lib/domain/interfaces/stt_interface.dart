@@ -4,11 +4,12 @@ abstract class SttInterface {
     required void Function(String error) onError,
   });
 
-  void listen({
+  Future<void> listen({
     required void Function(String text, bool isFinal) onResult,
     Duration pauseFor,
     Duration listenFor,
     String localeId,
+    void Function(String status)? onStatus,
   });
 
   void stop();

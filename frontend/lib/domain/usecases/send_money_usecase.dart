@@ -1,6 +1,6 @@
 // domain/usecases/send_money_usecase.dart
 import '../entities/transfer.dart';
-import '../repositories/transfer_repository.dart';
+import '../repositories/transfer_interface.dart';
 
 class SendMoneyUseCase {
   final TransferRepository repository;

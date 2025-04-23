@@ -21,6 +21,7 @@ frontend/ios/.generated/
 frontend/macos/Flutter/
 frontend/macos/.generated/
 frontend/*.iml
+frontend/onnx_models/
 
 # ───────────────────────────
 # 민감 정보

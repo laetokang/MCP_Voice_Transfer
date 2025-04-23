@@ -1,3 +1,13 @@
+## benchmark
+| 목적                | 한국어 벤치마크 기준                     | 영어 벤치마크 대응 항목                   |
+| ----------------- | ------------------------------- | ------------------------------- |
+| Intent 분류 및 명령 이해 | Ko-GSM8k, KorNAT-CKA            | GSM8K, BoolQ                    |
+| Slot 추출 / 문맥 해석   | Ko-Winogrande, Ko-IFEval        | WinoGrande, ARC-e               |
+| JSON 구조화 응답 생성    | Ko-IFEval                       | HumanEval, MBPP (간접 지표)         |
+| 챗봇 응답 톤/유용성       | Ko-Helpfulness, Ko-Harmlessness | SocialIQA, HellaSwag, BIG-Bench |
+
+---
+
 ## 🔧 **단계별 개발 방향성**
 
 ### 🔹 1단계: **단일 경량 모델 기반 MVP 구조 정착**

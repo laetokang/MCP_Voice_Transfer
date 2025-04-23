@@ -1,9 +1,13 @@
-```
-nlp_base : intent 및 간단한 response 반환 가능
-result: prompt_a 테스트 결과 값
-result1: prompt_b 테스트 결과 값
-sampling : 정답 데이터 set, 단 reponse 생성 X, 이후 추가 예정
-```
+
+## benchmark
+| 목적                | 한국어 벤치마크 기준                     | 영어 벤치마크 대응 항목                   |
+| ----------------- | ------------------------------- | ------------------------------- |
+| Intent 분류 및 명령 이해 | Ko-GSM8k, KorNAT-CKA            | GSM8K, BoolQ                    |
+| Slot 추출 / 문맥 해석   | Ko-Winogrande, Ko-IFEval        | WinoGrande, ARC-e               |
+| JSON 구조화 응답 생성    | Ko-IFEval                       | HumanEval, MBPP (간접 지표)         |
+| 챗봇 응답 톤/유용성       | Ko-Helpfulness, Ko-Harmlessness | SocialIQA, HellaSwag, BIG-Bench |
+
+---
 
 ## 🔧 **단계별 개발 방향성**
 

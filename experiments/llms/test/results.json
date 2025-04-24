@@ -1,0 +1,162 @@
+[
+  {
+    "input_text": "철수한테 오천 원 보내줘",
+    "expected_intent": "송금",
+    "predicted_intent": "transfer",
+    "slots": {},
+    "response": "철수님께 100,000원을 송금해드릴까요?",
+    "inference_time": 2.5
+  },
+  {
+    "input_text": "엄마한테 3만원만",
+    "expected_intent": "송금",
+    "predicted_intent": "transfer",
+    "slots": {},
+    "response": "엄마님께 30,000원을 송금해드릴까요?",
+    "inference_time": 2.26
+  },
+  {
+    "input_text": "만원만 보내줘",
+    "expected_intent": "송금",
+    "predicted_intent": "transfer",
+    "slots": {},
+    "response": "엄마님께 만원을 송금해드릴까요?",
+    "inference_time": 2.3
+  },
+  {
+    "input_text": "엄마한테 보내줘",
+    "expected_intent": "송금",
+    "predicted_intent": "transfer",
+    "slots": {},
+    "response": "엄마님께 보내줄 금액을 알려주세요.",
+    "inference_time": 2.3
+  },
+  {
+    "input_text": "나 송금하고 싶어",
+    "expected_intent": "송금",
+    "predicted_intent": "transfer",
+    "slots": {},
+    "response": "당신이 송금하고 싶은 금액과 받을 사람을 알려주세요.",
+    "inference_time": 2.37
+  },
+  {
+    "input_text": "가스비 내야 하는데 어떻게 해야 해?",
+    "expected_intent": "질문",
+    "predicted_intent": "inquiry",
+    "slots": {},
+    "response": "가스비 계산을 도와드릴까요?",
+    "inference_time": 2.36
+  },
+  {
+    "input_text": "내 계좌에 얼마 남았어?",
+    "expected_intent": "질문",
+    "predicted_intent": "inquiry",
+    "slots": {},
+    "response": "계좌에 얼마 있는지 알려주세요.",
+    "inference_time": 2.34
+  },
+  {
+    "input_text": "그 사람한테 또 보내줘",
+    "expected_intent": "송금",
+    "predicted_intent": "other",
+    "slots": {},
+    "response": "네, 다시 보내드릴게요.",
+    "inference_time": 2.36
+  },
+  {
+    "input_text": "아까랑 똑같이 보내줘",
+    "expected_intent": "송금",
+    "predicted_intent": "transfer",
+    "slots": {},
+    "response": "아까랑 30,000원을 송금해드릴까요?",
+    "inference_time": 2.36
+  },
+  {
+    "input_text": "송금할래",
+    "expected_intent": "송금",
+    "predicted_intent": "transfer",
+    "slots": {},
+    "response": "얼마를 송금하시겠습니까?",
+    "inference_time": 2.34
+  },
+  {
+    "input_text": "이체 수수료 얼마야?",
+    "expected_intent": "질문",
+    "predicted_intent": "inquiry",
+    "slots": {},
+    "response": "수수료는 엄마님께 10%입니다.",
+    "inference_time": 2.4
+  },
+  {
+    "input_text": "오늘 아빠랑 점심 먹었어",
+    "expected_intent": "기타",
+    "predicted_intent": "inquiry",
+    "slots": {},
+    "response": "오늘 아빠랑 점심 먹었니? 좋은 식사를 했나요?",
+    "inference_time": 2.45
+  },
+  {
+    "input_text": "아빠한테 이만원 보내줘",
+    "expected_intent": "송금",
+    "predicted_intent": "transfer",
+    "slots": {},
+    "response": "엄마님께 1,000원을 송금해드릴까요?",
+    "inference_time": 2.5
+  },
+  {
+    "input_text": "여보한테 십만 원 이체해줘",
+    "expected_intent": "송금",
+    "predicted_intent": "None",
+    "slots": {},
+    "response": "",
+    "inference_time": 2.48
+  },
+  {
+    "input_text": "보내지 마",
+    "expected_intent": "취소",
+    "predicted_intent": "None",
+    "slots": {},
+    "response": "",
+    "inference_time": 2.5
+  },
+  {
+    "input_text": "그냥 넘어가줘",
+    "expected_intent": "취소",
+    "predicted_intent": "other",
+    "slots": {},
+    "response": "넘어가세요.",
+    "inference_time": 2.47
+  },
+  {
+    "input_text": "엄마 송금해줘",
+    "expected_intent": "송금",
+    "predicted_intent": "transfer",
+    "slots": {},
+    "response": "엄마님께 송금하시겠습니까?",
+    "inference_time": 2.45
+  },
+  {
+    "input_text": "아, 삼만원 보내는 거였지",
+    "expected_intent": "확인",
+    "predicted_intent": "confirm",
+    "slots": {},
+    "response": "엄마님께 30,000원을 송금했습니다.",
+    "inference_time": 2.45
+  },
+  {
+    "input_text": "예금해줘",
+    "expected_intent": "기타",
+    "predicted_intent": "transfer",
+    "slots": {},
+    "response": "예금을 하시겠습니까? 얼마를 예금할까요?",
+    "inference_time": 2.48
+  },
+  {
+    "input_text": "누구한테 보낼까요?",
+    "expected_intent": "시스템응답",
+    "predicted_intent": "inquiry",
+    "slots": {},
+    "response": "누가 보낼까요?",
+    "inference_time": 2.41
+  }
+]

@@ -12,6 +12,7 @@ set(CMAKE_BUILD_PARALLEL_LEVEL 6)
 add_library(whisper_flutter SHARED main.cpp)
 file(GLOB WHISPER_SRC whisper.cpp/*.cpp whisper.cpp/*.c)
 add_library(whisper ${WHISPER_SRC})
+target_compile_definitions(whisper PRIVATE GGML_USE_VULKAN=1)
 
 set_target_properties(whisper_flutter PROPERTIES
   PUBLIC_HEADER whisper.cpp/whisper.h 

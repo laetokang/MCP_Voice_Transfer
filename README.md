@@ -13,26 +13,6 @@ MCP_Voice_Transfer는 **모바일 음성 명령 기반 송금 시스템**을 목
 
 <br>
 
-## 2. 모델 성능 검증
-
-###  1. STT 모듈 (음성 → 텍스트 변환)
-
-- **검증 목표**: 음성 입력에 대해 정확한 텍스트 변환 수행 여부 확인
-
-- **평가 지표**:
-  - `WER (Word Error Rate, 어절 오류율)`: 띄어쓰기 단위의 오류율. NLU 등 후속 처리 성능과 연관성 파악에 용이.
-    - 계산 공식: `WER = (S + I + D) / N`
-      - `S`: 대체된 어절 수 (Substitutions)
-      - `I`: 잘못 삽입된 어절 수 (Insertions)
-      - `D`: 누락된 어절 수 (Deletions)
-      - `N`: 원문(정답)의 총 어절 수 (Number of words in reference)
-  - `CER (Character Error Rate, 음절/글자 오류율)`: 글자 단위의 오류율. 띄어쓰기 오류에 덜 민감하며 순수 음향 모델 성능 평가에 유용.
-    - 계산 공식: `CER = (S + I + D) / N`
-      - `S`: 대체된 글자 수 (Substitutions)
-      - `I`: 잘못 삽입된 글자 수 (Insertions)
-      - `D`: 누락된 글자 수 (Deletions)
-      - `N`: 원문(정답)의 총 글자 수 (Number of characters in reference)
-
 - **예시**:
 | 실제 문장              | STT 결과                         | WER |
 |------------------------|----------------------------------|-----|
@@ -55,14 +35,13 @@ MCP_Voice_Transfer는 **모바일 음성 명령 기반 송금 시스템**을 목
 
 ## 🛠️ 기술 스택
 
-* **Backend**: FastAPI (Python), SQLite (기본), Redis (캐싱/세션 관리용 고려)
+* **Backend**: FastAPI (Python), SQLite (기본)
 * **LLM & NLU**: Ollama (phi3-mini 등 sLM 기반), EXAONE-DEEP (LG AI Research) 연동 고려
 * **Frontend**: Flutter (Cross-platform), Android Native (음성 처리 연동)
-* **Voice**: Android STT/TTS API, On-Device STT 모델 (연구/개발 중)
-* **FDS/Auth**: Rule-based FDS, ECAPA-TDNN 등 경량 화자 인식 모델
-* **Infra**: Docker, (추후 MLOps 파이프라인 구축 예정)
-* **MCP**: 표준 모델 호출 인터페이스 규약 기반 REST API 설계
-
+* **Voice**: Whisper.cpp, On-Device STT 모델 (연구/개발 중)
+* **Auth**: ECAPA-TDNN 등 경량 화자 인식 모델
+* **FDS**: Rule-based FDS
+* **Infra**: Docker
 </br>
 
 ## 📊 시스템 아키텍처 개요

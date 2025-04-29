@@ -49,6 +49,9 @@ dependencies:
   freezed_annotation: ^2.4.4
   whisper_flutter_new: ^1.0.1
   onnxruntime: ^1.4.1
+  # ollama: 
+    # path: packages/dart-ollama
+
 
 dev_dependencies:
   flutter_test:

@@ -63,23 +63,23 @@ Android 14의 주요 변경 사항 중 앱 성능 및 네트워크 통신에 영
 
 ## 📊 AI 처리 성능 및 온디바이스 추론 환경 (Samsung Galaxy S22 기준)
 
-| 항목                        | 내용                                                                                  |
-|-----------------------------|-----------------------------------------------------------------------------------------|
-| **AI SoC 탑재 여부**        | ✅ 있음 - Snapdragon 8 Gen 1 / Exynos 2200 모두 NPU 탑재 (세대는 1세대 AI 엔진)            |
-| **온디바이스 추론 속도**     | 🔄 Whisper base 기준 지연시간 약 400~700ms <br> 🔄 TPS: 약 0.7~1.1 <br> 🔥 발열 있음 (5분 이상 사용 시 42~46°C) |
-| **TFLite 구동 가능 여부**    | ✅ 가능 - `tflite_flutter` 등으로 Flutter에서 실행 가능                                   |
-| **ONNX 구동 가능 여부**      | ✅ 가능 - `onnxruntime-mobile` 또는 `JNI + C++` 방식으로 구동 가능                        |
-| **ggml 구동 가능 여부**      | ⚠️ 가능하나 **지연시간이 더 길어짐**, 작은 모델(whisper tiny/base 등)에 적합             |
-| **Flutter + JNI 연동**       | ✅ 가능 - `android/app/src/main/cpp`에 CMake 연동 설정 시 문제없이 작동                   |
-| **Flutter + Rust 연동**      | ✅ 가능 - `flutter_rust_bridge`, `uni_ffigen` 등으로 연동 가능                            |
-| **OS 지원**                 | ✅ Android 13 이상 지원 (One UI 6.0까지 공식 지원됨, 일부 기기 Android 14 업그레이드 지원) |
-| **메모리 8GB 이상 여부**     | ✅ 8GB RAM 탑재 → 일반적인 온디바이스 STT/LLM 추론 가능                                   |
+| 항목                      | 내용                                                                                                            |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **AI SoC 탑재 여부**      | ✅ 있음 - Snapdragon 8 Gen 1 / Exynos 2200 모두 NPU 탑재 (세대는 1세대 AI 엔진)                                 |
+| **온디바이스 추론 속도**  | 🔄 Whisper base 기준 지연시간 약 400~700ms <br> 🔄 TPS: 약 0.7~1.1 <br> 🔥 발열 있음 (5분 이상 사용 시 42~46°C) |
+| **TFLite 구동 가능 여부** | ✅ 가능 - `tflite_flutter` 등으로 Flutter에서 실행 가능                                                         |
+| **ONNX 구동 가능 여부**   | ✅ 가능 - `onnxruntime-mobile` 또는 `JNI + C++` 방식으로 구동 가능                                              |
+| **ggml 구동 가능 여부**   | ⚠️ 가능하나 **지연시간이 더 길어짐**, 작은 모델(whisper tiny/base 등)에 적합                                    |
+| **Flutter + JNI 연동**    | ✅ 가능 - `android/app/src/main/cpp`에 CMake 연동 설정 시 문제없이 작동                                         |
+| **Flutter + Rust 연동**   | ✅ 가능 - `flutter_rust_bridge`, `uni_ffigen` 등으로 연동 가능                                                  |
+| **OS 지원**               | ✅ Android 13 이상 지원 (One UI 6.0까지 공식 지원됨, 일부 기기 Android 14 업그레이드 지원)                      |
+| **메모리 8GB 이상 여부**  | ✅ 8GB RAM 탑재 → 일반적인 온디바이스 STT/LLM 추론 가능                                                         |
 
 ---
 
 📌 **요약**:
+
 - **S22는 온디바이스 AI 추론이 가능한 수준이지만**, **발열 및 추론 속도 측면에서는 고성능 기기보다 제한적**
 - Whisper small/base 모델로 실시간 추론은 가능하지만, **chunk 단위 또는 streaming 시 latency 최적화 필요**
 - TFLite, ONNX, ggml 모두 실행 가능하며, **Flutter + JNI 연동도 테스트 및 배포 환경 구축 가능**
 - 장시간 사용 시 발열 이슈 주의 + **온디바이스 추론 시 배터리 소모량 고려 필요**
-

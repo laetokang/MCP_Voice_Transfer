@@ -73,33 +73,23 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     final chatbotIndex = messages.length - 1;
 
-    // await ref.read(nluViewModelProvider).analyze(text);
-    // final nlu = ref.read(nluViewModelProvider);
-    // print("Intent: ${nlu.intent}, Slots: ${nlu.slots}");
-
     try {
       print("📨 NLU 요청 시작: $text");
-      await ref.read(nluViewModelProvider).generate(text);
       final nlu = ref.read(nluViewModelProvider);
-      print("🧠 생성된 응답: ${nlu.response}");
+      await nlu.generate(text, (String finalReply) {
+        setState(() {
+          messages.add({"text": finalReply, "type": "system"});
 
-      await ChatApi(
-        messages: messages,
-        onPartialResponse: (replyText) {
-          setState(() {
-            messages[chatbotIndex] = {"text": replyText, "type": "system"};
-          });
           _scrollToBottom();
-        },
-        onError: (errorMsg) {
-          setState(() {
-            messages[chatbotIndex] = {"text": errorMsg, "type": "system"};
-          });
-        },
-      );
+        });
+        print("🧠 생성된 응답: $finalReply");
+      });
     } catch (e, stack) {
       print("❌ _handleSubmitted 예외: $e");
       print(stack);
+      setState(() {
+        messages[chatbotIndex] = {"text": "오류가 발생했어요", "type": "system"};
+      });
     }
   }
 

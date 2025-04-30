@@ -7,11 +7,6 @@ import 'package:voicetransfer/presentation/pages/home_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // try {
-  //   await NluService.initialize();
-  // } catch (e) {
-  //   print("❌ [Main] NLU 초기화 실패: $e");
-  // }
   runApp(ProviderScope(child: MyApp()));
 }
 

@@ -57,5 +57,3 @@ frontend/coverage/
 backend/venv/
 backend/__pycache__/
 backend/*.pyc
-
-packages/

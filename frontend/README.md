@@ -74,18 +74,17 @@ flutter doctor
 2. llama.cpp 서브모듈 설치
 
 ```bash
-cd frontend/packages/llama_cpp_dart
-git submodule update --init
+git submodule add https://github.com/netdur/llama_cpp_dart.git frontend/packages/llama_cpp_dart
+git submodule init
+git submodule update
 ```
-
-````
 
 3. pubspec.yaml에 의존성 확인 후:
 
 ```bash
 flutter pub get
 flutter run
-````
+```
 
 ## 📂 4. STT 방식 교체 방법
 

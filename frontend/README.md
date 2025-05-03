@@ -74,9 +74,8 @@ flutter doctor
 2. llama.cpp 서브모듈 설치
 
 ```bash
-git submodule add https://github.com/netdur/llama_cpp_dart.git frontend/packages/llama_cpp_dart
-git submodule init
-git submodule update
+git submodule sync
+git submodule update --init --recursive --force
 ```
 
 3. pubspec.yaml에 의존성 확인 후:

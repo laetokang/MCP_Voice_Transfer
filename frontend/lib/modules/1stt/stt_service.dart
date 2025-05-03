@@ -1,5 +1,5 @@
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import '../../../domain/repositories/stt_interface.dart';
+import '../../presentation/repositories/stt_interface.dart';
 
 class SttService implements SttInterface {
   final stt.SpeechToText _speech = stt.SpeechToText();

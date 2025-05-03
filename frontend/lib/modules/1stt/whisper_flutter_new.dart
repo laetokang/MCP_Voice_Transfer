@@ -6,16 +6,16 @@ import "dart:isolate";
 import "package:ffi/ffi.dart";
 import "package:flutter/foundation.dart";
 import "package:path_provider/path_provider.dart";
-import "../../models/whisper/_models.dart";
+import "whisper/_models.dart";
 
 // import "package:whisper_flutter_new/bean/whisper_dto.dart";
-import "../../models/whisper/whisper_dto.dart";
-import "../stt/download_model.dart" show WhisperModel, downloadModel;
+import "whisper/whisper_dto.dart";
+import "download_model.dart" show WhisperModel, downloadModel;
 // import "package:whisper_flutter_new/whisper_bindings_generated.dart";
-import "../stt/whisper_bindings_generated.dart";
+import "whisper/whisper_bindings_generated.dart";
 
-export "../../models/whisper/_models.dart";
-export "../stt/download_model.dart" show WhisperModel;
+export "whisper/_models.dart";
+export "download_model.dart" show WhisperModel;
 
 /// Entry point of whisper_flutter_plus
 class Whisper {

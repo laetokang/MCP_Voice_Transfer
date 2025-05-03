@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:voicetransfer/data/datasources/nlu/nlu_service.dart';
+import 'package:voicetransfer/modules/2nlu/nlu_service.dart';
 import 'dart:convert';
 
 enum NluUiState { idle, analyzing, success, error }

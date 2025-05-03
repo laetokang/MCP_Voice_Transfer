@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:voicetransfer/core/network/api.dart';
+import 'package:voicetransfer/utils/network/api.dart';
 import 'package:voicetransfer/presentation/providers/nlu_provider.dart';
 import 'package:voicetransfer/presentation/providers/stt_provider.dart';
 import 'package:voicetransfer/presentation/viewmodels/stt_viewmodel.dart';

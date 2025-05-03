@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:voicetransfer/domain/repositories/stt_interface.dart';
+import 'package:voicetransfer/presentation/repositories/stt_interface.dart';
 
 class ListenAndTranscribe {
   final SttInterface stt;

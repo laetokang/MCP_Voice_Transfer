@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voicetransfer/presentation/viewmodels/nlu_viewmodel.dart';
-import 'package:voicetransfer/data/datasources/nlu/nlu_service.dart';
+import 'package:voicetransfer/modules/2nlu/nlu_service.dart';
 
 // NluService Provider
 final nluServiceProvider = Provider<NluService>((ref) {

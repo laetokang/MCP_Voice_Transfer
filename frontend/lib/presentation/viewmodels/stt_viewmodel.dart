@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voicetransfer/domain/usecases/stt_usecases.dart';
+import 'package:voicetransfer/modules/1stt/stt_usecases.dart';
 
 enum SttUiState {
   idle,

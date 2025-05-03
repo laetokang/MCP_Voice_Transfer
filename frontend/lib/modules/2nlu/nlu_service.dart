@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+
 class QwenPromptFormat extends PromptFormat {
   QwenPromptFormat()
     : super(
@@ -27,6 +30,33 @@ $prompt
   }
 }
 
+Future<String> downloadQwenModel({
+  required String modelName,
+  required String destinationPath,
+}) async {
+  final url =
+      "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/$modelName";
+
+  final httpClient = HttpClient();
+  final request = await httpClient.getUrl(Uri.parse(url));
+  final response = await request.close();
+
+  final file = File('$destinationPath/$modelName');
+  final raf = file.openSync(mode: FileMode.write);
+
+  await for (var chunk in response) {
+    raf.writeFromSync(chunk);
+  }
+
+  await raf.close();
+
+  if (kDebugMode) {
+    debugPrint("✅ Qwen 모델 다운로드 완료: ${file.path}");
+  }
+
+  return file.path;
+}
+
 class NluService {
   late final LlamaParent _llamaParent;
   late final String _localModelPath;
@@ -36,21 +66,20 @@ class NluService {
   NluService();
 
   Future<void> _prepareModel() async {
-    final byteData = await rootBundle.load(
-      'assets/qwen2.5-0.5b-instruct-q2_k.gguf',
-    );
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/qwen2.5-0.5b-instruct-q2_k.gguf');
+    final modelName = 'qwen2.5-0.5b-instruct-q2_k.gguf';
+    final file = File('${directory.path}/$modelName');
 
     if (!(await file.exists())) {
-      print('📦 모델 파일 복사 중...');
-      await file.writeAsBytes(byteData.buffer.asUint8List());
-      print('✅ 모델 파일 복사 완료: ${file.path}');
+      print('🌐 Qwen 모델 다운로드 시작...');
+      _localModelPath = await downloadQwenModel(
+        modelName: modelName,
+        destinationPath: directory.path,
+      );
     } else {
       print('⚡ 이미 모델 파일 존재: ${file.path}');
+      _localModelPath = file.path;
     }
-
-    _localModelPath = file.path;
   }
 
   Future<void> initialize() async {

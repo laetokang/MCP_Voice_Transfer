@@ -9,7 +9,7 @@ import "dart:convert";
 
 import "package:freezed_annotation/freezed_annotation.dart";
 
-import "../whisper/whisper_dto.dart";
+import "whisper_dto.dart";
 
 part "request_bean.freezed.dart";
 part "request_bean.g.dart";

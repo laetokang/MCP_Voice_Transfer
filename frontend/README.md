@@ -8,10 +8,12 @@ Flutter 기반 음성 송금 인터페이스 시스템입니다.
 ### 모바일 연동 및 OS 확장
 
 - **[10] Android STT + TTS 연동**
+
   - STT: 사용자 발화 → 텍스트 변환
   - TTS: 서버 응답 → 음성 안내로 출력
 
 - **[11] FastAPI 연동 Android 클라이언트**
+
   - Retrofit 등으로 `/intent`, `/transfer` 호출
   - 챗 UI 또는 음성 기반 UI 제공
 
@@ -40,7 +42,7 @@ Flutter 기반 음성 송금 인터페이스 시스템입니다.
 ---
 
 ### ✅ 2. 폴더 구조
- 
+
 ```
 lib/
 ├── core/                  # 공통 유틸리티 (API 설정, 시간 기록 등)
@@ -69,12 +71,21 @@ lib/
 flutter doctor
 ```
 
-2. pubspec.yaml에 의존성 확인 후:
+2. llama.cpp 서브모듈 설치
+
+```bash
+cd frontend/packages/llama_cpp_dart
+git submodule update --init
+```
+
+````
+
+3. pubspec.yaml에 의존성 확인 후:
 
 ```bash
 flutter pub get
 flutter run
-```
+````
 
 ## 📂 4. STT 방식 교체 방법
 

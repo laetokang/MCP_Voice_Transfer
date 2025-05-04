@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:voicetransfer/modules/1stt/stt_usecases.dart';
 
 enum SttUiState {
-  idle,
-  downloadingModel,
-  initializingModel,
-  recording,
-  transcribing,
-  unloadingModel,
-  error,
+  idle, // 아무 동작 안하는 중
+  downloadingModel, // 모델 다운로드 중
+  initializingModel, // 모델 초기화 중
+  recording, // 사용자의 음성을 듣는 중
+  transcribing, // 음성 → 텍스트 변환 중
+  unloadingModel, // 모델 제거 중
+  error, // 오류 발생
 }
 
 class SttViewModel extends ChangeNotifier {
@@ -16,13 +16,11 @@ class SttViewModel extends ChangeNotifier {
 
   String resultText = '';
   String errorMessage = '';
-  String statusMessage = '';
 
+  // 내부 상태 관리
   SttUiState _state = SttUiState.idle;
   int _lastStateTimestamp = DateTime.now().millisecondsSinceEpoch;
   int? _previousStateTimestamp;
-
-  bool isListening = false;
 
   // Getter
   SttUiState get state => _state;
@@ -41,12 +39,9 @@ class SttViewModel extends ChangeNotifier {
   }
 
   Future<void> startListening() async {
-    isListening = true;
     resultText = '';
     errorMessage = '';
-    statusMessage = '모델 초기화 중...';
     _setState(SttUiState.initializingModel); // 초기 상태로 지정
-    notifyListeners();
 
     resultText = await useCase(
       onPartial: (text) {
@@ -79,13 +74,11 @@ class SttViewModel extends ChangeNotifier {
       },
     );
 
-    isListening = false;
     notifyListeners();
   }
 
   void stopListening() {
     useCase.stop();
-    isListening = false;
     notifyListeners();
   }
 }

@@ -96,14 +96,14 @@ class NluService {
     await _llamaParent.init();
     print("🟢 [NLU Init] 모델 세션 로딩 성공!");
 
-    _llamaParent.stream.listen((response) {
-      if (response.trim().isEmpty) {
-        print('🧠 (경고) 빈 응답 수신!');
-      } else {
-        _responseBuffer.write(response); // 누적
-        print('🧠 모델 응답 스트림 수신: "$response"');
-      }
-    });
+    // _llamaParent.stream.listen((response) {
+    //   if (response.trim().isEmpty) {
+    //     print('🧠 (경고) 빈 응답 수신!');
+    //   } else {
+    //     _responseBuffer.write(response); // 누적
+    //     print('🧠 모델 응답 스트림 수신: "$response"');
+    //   }
+    // });
 
     _llamaParent.completions.listen((event) {
       print('📥 Completion 완료됨: $event');

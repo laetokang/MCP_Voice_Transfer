@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:voicetransfer/modules/2nlu/nlu_provider.dart';
 import 'package:voicetransfer/modules/1stt/stt_provider.dart';
+import 'package:voicetransfer/presentation/viewmodels/nlu_viewmodel.dart';
 import 'package:voicetransfer/presentation/viewmodels/stt_viewmodel.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
@@ -24,8 +25,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   bool autoSend = false;
 
-  late final ProviderSubscription<SttViewModel> _listener;
-
   @override
   void initState() {
     super.initState();
@@ -43,14 +42,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
   }
 
-  @override
-  void dispose() {
-    _listener.close();
-    _scrollController.dispose();
-    _textController.dispose();
-    super.dispose();
-  }
-
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -66,23 +57,32 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   void _handleSubmitted(String text) async {
     setState(() {
       messages.add({"text": text, "type": "user"});
-      messages.add({"text": "", "type": "system"});
+      messages.add({"text": "", "type": "system"}); // ✅ 빈 시스템 응답 추가
       _scrollToBottom();
     });
 
-    final chatbotIndex = messages.length - 1;
+    final chatbotIndex = messages.length - 1; // ✅ 마지막 system 메시지 위치
 
     try {
       print("📨 NLU 요청 시작: $text");
       final nlu = ref.read(nluViewModelProvider);
-      await nlu.generate(text, (String finalReply) {
-        setState(() {
-          messages.add({"text": finalReply, "type": "system"});
 
-          _scrollToBottom();
-        });
-        print("🧠 생성된 응답: $finalReply");
-      });
+      await nlu.generate(
+        text,
+        (String finalReply) {
+          setState(() {
+            messages[chatbotIndex]["text"] = finalReply; // ✅ 최종 덮어쓰기
+            _scrollToBottom();
+          });
+          print("🧠 생성된 응답: $finalReply");
+        },
+        onUpdate: (partial) {
+          setState(() {
+            messages[chatbotIndex]["text"] = partial; // ✅ 중간결과 누적 갱신
+            _scrollToBottom();
+          });
+        },
+      );
     } catch (e, stack) {
       print("❌ _handleSubmitted 예외: $e");
       print(stack);
@@ -92,41 +92,70 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
   }
 
-  String getStateText(
-    SttUiState state,
-    int timestamp,
+  String getStateText({
+    required SttUiState sttState,
+    required NluUiState nluState,
+    required int timestamp,
     int? previousTimestamp,
     int? now,
-  ) {
+    String? nluResponse,
+    String? nluError,
+  }) {
     final current = now ?? DateTime.now().millisecondsSinceEpoch;
     final elapsed = current - timestamp;
     final sinceLast =
         previousTimestamp != null ? timestamp - previousTimestamp : null;
 
-    String label;
-    switch (state) {
+    String label = '';
+
+    // 1. NLU 상태 우선 처리 (성공 or 오류 시 즉시 출력)
+    if (nluState == NluUiState.success &&
+        nluResponse != null &&
+        nluResponse.isNotEmpty) {
+      return '✅ 응답: $nluResponse';
+    } else if (nluState == NluUiState.error && nluError != null) {
+      return '❌ 오류: $nluError';
+    }
+
+    // 2. NLU 진행 중 상태 표시
+    switch (nluState) {
+      case NluUiState.downloadingModel:
+        return "📥 NLU 모델 다운로드 중...";
+      case NluUiState.loadingModel:
+        return "🔧 NLU 모델 로딩 중...";
+      case NluUiState.analyzing:
+        return "🧠 텍스트 분석 중...";
+      default:
+        break; // 진행 없음 → STT 상태로 넘어감
+    }
+
+    // 3. STT 상태 메시지 출력
+    switch (sttState) {
       case SttUiState.downloadingModel:
-        label = "📥 모델 다운로드 중...";
+        label = "📥 STT 모델 다운로드 중...";
         break;
       case SttUiState.initializingModel:
-        label = "🔧 모델 초기화 중...";
+        label = "🔧 STT 모델 초기화 중...";
         break;
       case SttUiState.recording:
         label = "🎙️ 마이크 녹음 중...";
         break;
       case SttUiState.transcribing:
-        label = "🧠 추론 중...";
+        label = "🧠 음성 → 텍스트 추론 중...";
         break;
       case SttUiState.unloadingModel:
-        label = "📤 모델 언로딩 중...";
+        label = "📤 STT 모델 언로딩 중...";
         break;
       case SttUiState.error:
-        label = "❌ 오류 발생!";
+        label = "❌ STT 오류 발생!";
         break;
+      case SttUiState.idle:
       default:
         label = "";
     }
-    if (state != SttUiState.idle) {
+
+    // 4. 시간 정보 추가
+    if (sttState != SttUiState.idle && label.isNotEmpty) {
       label += " (${elapsed}ms 경과";
       if (sinceLast != null) {
         label += ", 이전 상태로부터 +${sinceLast}ms)";
@@ -134,13 +163,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         label += ")";
       }
     }
+
     return label;
   }
 
   @override
   Widget build(BuildContext context) {
     final sttViewModel = ref.watch(sttViewModelProvider);
-
+    final nluViewModel = ref.watch(nluViewModelProvider);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Column(
@@ -164,9 +194,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
                         if (sttViewModel.resultText.isNotEmpty) {
                           print("📨 STT 결과 자동 제출: ${sttViewModel.resultText}");
-                          if (autoSend) {
-                            _handleSubmitted(sttViewModel.resultText);
-                          }
+                          _handleSubmitted(sttViewModel.resultText);
                         }
                       } else {
                         sttViewModel.stopListening();
@@ -179,10 +207,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                       final now = DateTime.now().millisecondsSinceEpoch;
                       return Text(
                         getStateText(
-                          sttViewModel.state,
-                          sttViewModel.stateChangedAt,
-                          sttViewModel.previousStateChangedAt,
-                          now,
+                          sttState: sttViewModel.state,
+                          nluState: nluViewModel.state,
+                          timestamp: sttViewModel.stateChangedAt,
+                          previousTimestamp:
+                              sttViewModel.previousStateChangedAt,
+                          now: now,
+                          nluResponse: nluViewModel.response,
+                          nluError: nluViewModel.errorMessage,
                         ),
                         style: const TextStyle(
                           color: Colors.grey,

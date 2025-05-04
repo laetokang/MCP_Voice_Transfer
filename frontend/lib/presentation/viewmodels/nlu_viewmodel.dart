@@ -2,78 +2,91 @@ import 'package:flutter/foundation.dart';
 import 'package:voicetransfer/modules/2nlu/nlu_service.dart';
 import 'dart:convert';
 
-enum NluUiState { idle, analyzing, success, error }
+enum NluUiState {
+  idle,
+  downloadingModel,
+  loadingModel,
+  analyzing,
+  success,
+  error,
+}
 
 class NluViewModel extends ChangeNotifier {
   final NluService _nluService;
+
   String _response = '';
-  String _error = '';
-  bool _loading = false;
+  String _errorMessage = '';
+  NluUiState _state = NluUiState.idle;
 
   String get response => _response;
-  String get error => _error;
-  bool get isLoading => _loading;
+  String get errorMessage => _errorMessage;
+  NluUiState get state => _state;
+  bool get isLoading =>
+      _state == NluUiState.analyzing || _state == NluUiState.loadingModel;
 
   NluViewModel(this._nluService);
 
+  void _setState(NluUiState newState) {
+    if (_state != newState) {
+      _state = newState;
+      notifyListeners();
+    }
+  }
+
   Future<void> generate(
     String inputText,
-    void Function(String) onComplete,
-  ) async {
-    _loading = true;
+    void Function(String) onComplete, {
+    void Function(String)? onUpdate, // ✅ 중간 응답 콜백 추가
+  }) async {
     _response = '';
-    _error = '';
-    notifyListeners();
+    _errorMessage = '';
+    _setState(NluUiState.analyzing);
 
-    final buffer = StringBuffer();
     final List<int> _byteBuffer = [];
 
     try {
-      // 스트리밍 응답 받아오기
       final streamSub = _nluService.stream.listen((chunk) {
         if (chunk.isNotEmpty) {
-          // 1. chunk를 일단 Latin1(ISO-8859-1)로 bytes화
           final bytes = latin1.encode(chunk);
           _byteBuffer.addAll(bytes);
 
           try {
-            // 2. 그 bytes를 UTF-8로 다시 decode
-            final decoded = utf8.decode(_byteBuffer);
+            final decoded = const Utf8Decoder(
+              allowMalformed: true,
+            ).convert(_byteBuffer);
             _response = decoded;
             notifyListeners();
-          } catch (e) {
-            // 아직 조립이 안 끝난 중간 상태일 수 있으니 무시
-          }
+            if (onUpdate != null) onUpdate(_response); // ✅ 중간 응답 전송
+          } catch (_) {}
         }
       });
 
       final completionSub = _nluService.completions.listen((_) {
         try {
-          final decoded = utf8.decode(_byteBuffer);
+          final decoded = const Utf8Decoder(
+            allowMalformed: true,
+          ).convert(_byteBuffer);
           _response = decoded;
-        } catch (e) {
+          notifyListeners();
+        } catch (_) {
           _response = '디코딩 에러 발생';
+          _setState(NluUiState.error);
         }
         _byteBuffer.clear();
-        _loading = false;
-        notifyListeners();
+        _setState(NluUiState.success);
         onComplete(_response);
       });
 
       _nluService.ask(inputText);
-
-      // cleanup: 옵션. 필요시 둘 다 await + cancel 가능
     } catch (e) {
-      _error = e.toString();
-      _loading = false;
-      notifyListeners();
+      _errorMessage = e.toString();
+      _setState(NluUiState.error);
     }
   }
 
   void reset() {
     _response = '';
-    _error = '';
-    _loading = false;
-    notifyListeners();
+    _errorMessage = '';
+    _setState(NluUiState.idle);
   }
 }

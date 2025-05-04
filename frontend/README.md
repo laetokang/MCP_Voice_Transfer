@@ -147,7 +147,7 @@ final sttViewModelProvider = ChangeNotifierProvider<SttViewModel>((ref) {
 - frontend\lib\modules\1stt\stt_service_whisper.dart 내
 
 ```
- // Hugging Face 모델 URL 교체체
+ // Hugging Face 모델 URL 교체
   final url =
       "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/$modelName";
 
@@ -156,7 +156,7 @@ final sttViewModelProvider = ChangeNotifierProvider<SttViewModel>((ref) {
 - frontend\lib\modules\1stt\stt_service_whisper.dart 내
 
 ```
-//언어모델 프롬프트 수정정
+//언어모델 프롬프트 수정
 class QwenPromptFormat extends PromptFormat {
   QwenPromptFormat()
     : super(

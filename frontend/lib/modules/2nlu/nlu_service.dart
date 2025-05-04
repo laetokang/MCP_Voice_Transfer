@@ -1,9 +1,6 @@
 import 'dart:io';
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:llama_cpp_dart/llama_cpp_dart.dart';
-
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 //언어모델 프롬프트 수정

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter/services.dart';
 
 Future<String> prepareOnnxModel(String fileName) async {
   final appDocDir = await getApplicationDocumentsDirectory();

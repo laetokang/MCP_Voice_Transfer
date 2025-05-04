@@ -142,8 +142,6 @@ final sttViewModelProvider = ChangeNotifierProvider<SttViewModel>((ref) {
 
 ```
 
-## 📂 7. sLMs 모델 교체 방법2 (현재 Qwen2.5-0.5B-Instruct-GGUF)
-
 - frontend\lib\modules\1stt\stt_service_whisper.dart 내
 
 ```

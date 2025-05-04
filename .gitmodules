@@ -1,0 +1,3 @@
+[submodule "frontend/packages/llama_cpp_dart"]
+	path = frontend/packages/llama_cpp_dart
+	url = https://github.com/netdur/llama_cpp_dart.git

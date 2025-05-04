@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:voicetransfer/core/utils/timeLogger.dart';
-import 'package:voicetransfer/data/datasources/nlu/nlu_service.dart';
 import 'package:voicetransfer/presentation/pages/home_page.dart';
 
 void main() async {

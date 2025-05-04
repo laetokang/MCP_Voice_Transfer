@@ -6,6 +6,7 @@ import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
+//언어모델 프롬프트 수정
 class QwenPromptFormat extends PromptFormat {
   QwenPromptFormat()
     : super(
@@ -34,6 +35,7 @@ Future<String> downloadQwenModel({
   required String modelName,
   required String destinationPath,
 }) async {
+  // Hugging Face 모델 URL 교체
   final url =
       "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/$modelName";
 

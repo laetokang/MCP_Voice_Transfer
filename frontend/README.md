@@ -74,6 +74,7 @@ flutter doctor
 2. llama.cpp 서브모듈 설치
 
 ```bash
+cd $(git rev-parse --show-toplevel)
 git submodule sync
 git submodule update --init --recursive --force
 ```
@@ -81,13 +82,14 @@ git submodule update --init --recursive --force
 3. pubspec.yaml에 의존성 확인 후:
 
 ```bash
+cd frontend
 flutter pub get
 flutter run
 ```
 
 ## 📂 4. STT 방식 교체 방법
 
-- frontend/lib/presentation/providers/stt_provider.dart 내
+- frontend\lib\modules\1stt\stt_provider.dart 내
 
 ```
 final sttViewModelProvider = ChangeNotifierProvider<SttViewModel>((ref) {
@@ -119,7 +121,7 @@ final sttViewModelProvider = ChangeNotifierProvider<SttViewModel>((ref) {
 
 ## 📂 5. Whisper 모델 교체 방법(현재 baseQ8_0)
 
-- frontend/lib/data/datasources/stt/stt_service_whisper.dart 내
+- frontend\lib\modules\1stt\stt_service_whisper.dart 내
 
 ```
  whisper = Whisper(
@@ -127,6 +129,49 @@ final sttViewModelProvider = ChangeNotifierProvider<SttViewModel>((ref) {
       model: WhisperModel.baseQ8_0,
       downloadHost: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main",
 );
+```
+
+## 📂 6. sLMs 모델 교체 방법1 (현재 Qwen2.5-0.5B-Instruct-GGUF)
+
+- frontend\lib\modules\1stt\stt_service_whisper.dart 내
+
+```
+ // Hugging Face 모델 URL 교체체
+  final url =
+      "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/$modelName";
+
+```
+
+## 📂 7. sLMs 모델 교체 방법2 (현재 Qwen2.5-0.5B-Instruct-GGUF)
+
+- frontend\lib\modules\1stt\stt_service_whisper.dart 내
+
+```
+//언어모델 프롬프트 수정정
+class QwenPromptFormat extends PromptFormat {
+  QwenPromptFormat()
+    : super(
+        PromptFormatType.chatml,
+        inputSequence: "<|im_start|>user\n",
+        outputSequence: "<|im_end|>\n<|im_start|>assistant\n",
+        systemSequence: "<|im_start|>system\n",
+        stopSequence: "<|im_end|>",
+      );
+
+  @override
+  String formatPrompt(String prompt) {
+    return """
+<|im_start|>system
+You are a helpful assistant.
+<|im_end|>
+<|im_start|>user
+$prompt
+<|im_end|>
+<|im_start|>assistant
+""";
+  }
+}
+
 ```
 
 ## 📞 문의 및 기여

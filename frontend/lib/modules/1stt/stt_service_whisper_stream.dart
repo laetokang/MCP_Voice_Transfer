@@ -7,7 +7,7 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 // import 'package:whisper_flutter_new/whisper_flutter_new.dart';
 import "whisper_flutter_new.dart";
-import '../../presentation/repositories/stt_interface.dart';
+import 'stt_interface.dart';
 import 'package:voicetransfer/utils/utils/timeLogger.dart';
 
 class SttServiceWhisperStream implements SttInterface {

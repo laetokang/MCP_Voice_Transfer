@@ -40,7 +40,7 @@ lib/
 │   │   ├── whisper_flutter_new.dart         # Whisper.cpp FFI 연동 (네이티브 연동 담당)
 │   │   └── download_model.dart                  # Whisper 모델 다운로드/복사 유틸리티
 
-│   ├── nlu/
+│   ├── 2nlu/
 │   │   ├── dialog_manager.dart         # 다이얼로그 흐름 관리
 │   │   ├── nlu_model.dart              # 추론용 NLU 모델 정의 또는 래퍼
 │   │   ├── nlu_preprocessor.dart       # 텍스트 전처리기 (소문자화, 정제 등)
@@ -48,13 +48,13 @@ lib/
 │   │   ├── nlu_service.dart            # 실제 NLU 처리 서비스 (모델 호출 포함)
 │   │   └── slot_filler.dart            # 의도에 따른 슬롯 채우기 로직
 
-│   ├── dialog_manager/
+│   ├── 3dialog_manager/
 
-│   ├── tts/
+│   ├── 4tts/
 
-│   ├── auth/
+│   ├── 5auth/
 │
-│   └── transfer/
+│   └── 6transfer/
 │
 ├── presentation/                      # ViewModel, UI 상태관리(프론트엔드 전용)
 │   ├── constants/

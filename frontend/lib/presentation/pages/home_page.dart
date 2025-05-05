@@ -120,11 +120,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     // 2. NLU 진행 중 상태 표시
     switch (nluState) {
       case NluUiState.downloadingModel:
-        return "📥 NLU 모델 다운로드 중...";
+        label = "📥 NLU 모델 다운로드 중...";
+        break;
       case NluUiState.loadingModel:
-        return "🔧 NLU 모델 로딩 중...";
+        label = "🔧 NLU 모델 로딩 중...";
+        break;
       case NluUiState.analyzing:
-        return "🧠 텍스트 분석 중...";
+        label = "🧠 텍스트 분석 중...";
+        break;
       default:
         break; // 진행 없음 → STT 상태로 넘어감
     }

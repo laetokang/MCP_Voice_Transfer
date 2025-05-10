@@ -23,6 +23,17 @@ frontend/macos/.generated/
 frontend/*.iml
 frontend/onnx_models/
 
+# Flutter
+
+ios/Flutter/Generated.xcconfig
+frontend/*.ttf
+frontend/*.otf
+
+# macOS
+frontend/macos/.DS_Store
+
+
+
 # ───────────────────────────
 # 민감 정보
 # ───────────────────────────

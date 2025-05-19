@@ -32,7 +32,6 @@ Future<String> downloadQwenModel({
   required String modelName,
   required String destinationPath,
 }) async {
-  // Hugging Face 모델 URL 교체
   final url =
       "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/$modelName";
 
@@ -43,8 +42,20 @@ Future<String> downloadQwenModel({
   final file = File('$destinationPath/$modelName');
   final raf = file.openSync(mode: FileMode.write);
 
+  final contentLength = response.contentLength;
+  int downloadedBytes = 0;
+
   await for (var chunk in response) {
+    downloadedBytes += chunk.length;
     raf.writeFromSync(chunk);
+
+    // 다운로드 진행률 출력
+    if (kDebugMode && contentLength > 0) {
+      final progress = (downloadedBytes / contentLength * 100).toStringAsFixed(
+        2,
+      );
+      debugPrint("📥 qwen 다운로드 중... $progress%");
+    }
   }
 
   await raf.close();

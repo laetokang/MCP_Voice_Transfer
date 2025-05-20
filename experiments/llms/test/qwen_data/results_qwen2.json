@@ -1,0 +1,247 @@
+[
+  {
+    "text": "철수한테 오천 원 보내줘",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "엄마",
+      "amount": 10000
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.17
+    }
+  },
+  {
+    "text": "엄마한테 3만원만",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "엄마",
+      "amount": 30000
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.17
+    }
+  },
+  {
+    "text": "만원만 보내줘",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "엄마",
+      "amount": 1
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.11
+    }
+  },
+  {
+    "text": "엄마한테 보내줘",
+    "intent": null,
+    "slots": {
+      "recipient": null,
+      "amount": null
+    },
+    "response": "",
+    "_meta": {
+      "error": "Parsing failed",
+      "inference_time": 0.52
+    }
+  },
+  {
+    "text": "나 송금하고 싶어",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "엄마",
+      "amount": 30000
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 0.68
+    }
+  },
+  {
+    "text": "가스비 내야 하는데 어떻게 해야 해?",
+    "intent": null,
+    "slots": {
+      "recipient": null,
+      "amount": null
+    },
+    "response": "",
+    "_meta": {
+      "error": "Parsing failed",
+      "inference_time": 0.68
+    }
+  },
+  {
+    "text": "내 계좌에 얼마 남았어?",
+    "intent": "inquiry",
+    "slots": {
+      "recipient": "나",
+      "amount": null
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.01
+    }
+  },
+  {
+    "text": "그 사람한테 또 보내줘",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "제 친구",
+      "amount": 5000
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.37
+    }
+  },
+  {
+    "text": "아까랑 똑같이 보내줘",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "엄마",
+      "amount": 30000
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.31
+    }
+  },
+  {
+    "text": "송금할래",
+    "intent": null,
+    "slots": {
+      "recipient": null,
+      "amount": null
+    },
+    "response": "",
+    "_meta": {
+      "error": "Parsing failed",
+      "inference_time": 0.55
+    }
+  },
+  {
+    "text": "이체 수수료 얼마야?",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "이메일주소",
+      "amount": null
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.06
+    }
+  },
+  {
+    "text": "오늘 아빠랑 점심 먹었어",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "아빠",
+      "amount": 30000
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.57
+    }
+  },
+  {
+    "text": "아빠한테 이만원 보내줘",
+    "intent": null,
+    "slots": {
+      "recipient": null,
+      "amount": null
+    },
+    "response": "",
+    "_meta": {
+      "error": "Parsing failed",
+      "inference_time": 0.53
+    }
+  },
+  {
+    "text": "여보한테 십만 원 이체해줘",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "엄마",
+      "amount": 10000
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 0.7
+    }
+  },
+  {
+    "text": "보내지 마",
+    "intent": "other",
+    "slots": {
+      "recipient": null,
+      "amount": null
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 0.76
+    }
+  },
+  {
+    "text": "그냥 넘어가줘",
+    "intent": "other",
+    "slots": {
+      "recipient": null,
+      "amount": null
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.17
+    }
+  },
+  {
+    "text": "엄마 송금해줘",
+    "intent": null,
+    "slots": {
+      "recipient": null,
+      "amount": null
+    },
+    "response": "",
+    "_meta": {
+      "error": "Parsing failed",
+      "inference_time": 0.54
+    }
+  },
+  {
+    "text": "아, 삼만원 보내는 거였지",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "엄마",
+      "amount": 30000
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.34
+    }
+  },
+  {
+    "text": "예금해줘",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "부모님",
+      "amount": 5000
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 1.28
+    }
+  },
+  {
+    "text": "누구한테 보낼까요?",
+    "intent": "transfer",
+    "slots": {
+      "recipient": "손님",
+      "amount": null
+    },
+    "response": "",
+    "_meta": {
+      "inference_time": 0.86
+    }
+  }
+]

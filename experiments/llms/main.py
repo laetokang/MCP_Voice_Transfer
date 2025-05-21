@@ -1,3 +1,4 @@
+# pip install fastapi uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 import time
@@ -41,6 +42,11 @@ def unified_system_prompt(input_text: str) -> list:
         text: "엄마한테 삼만원 보내줘"
 
         {{ "intent": "transfer", "amount": 30000, "recipient": "엄마", "response": "엄마님께 30,000원을 송금해드릴까요?" }}
+         
+        text: "송금할래"
+        
+        {{"intent": "transfer","amount": null,"recipient": null,"response": "송금하실 대상과 금액을 말씀해주세요."}}
+
 
         **주의**:
         - `intent`는 반드시 위의 범주 중 하나로만 반환되어야 합니다.
@@ -100,20 +106,23 @@ def run_inference_qwen(input_text: str, tokenizer, model, max_new_tokens=128):
 # FastAPI 엔드포인트 정의
 @app.post("/process")
 async def process_text(input: TextInput):
-    # 텍스트를 LLM 모델로 보내서 결과를 받음
     result, parsing, elapsed = run_inference_qwen(input.text, qwen_tokenizer, qwen)
-    
+
     if parsing is None:
-        # 파싱 실패 처리
-        return {"error": "Parsing failed", "text": input.text, "raw_output": result}
-    
-    # 정상적으로 파싱된 JSON 반환
+        return {
+            "error": "Parsing failed",
+            "text": input.text,
+            "raw_output": result,
+            "_meta": {"inference_time": elapsed}
+        }
+
     return {
         "text": input.text,
         "intent": parsing["intent"],
-        "slots": parsing["slots"],
+        "slots": {
+            "recipient": parsing.get("recipient"),
+            "amount": parsing.get("amount")
+        },
         "response": parsing.get("response", ""),
         "_meta": {"inference_time": elapsed}
     }
-
-# 실행 방법 (terminal에서 실행): uvicorn app_name:app --reload

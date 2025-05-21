@@ -21,6 +21,8 @@ http://localhost:8000/docs
 ```
 
 📦 실행 파일: main.py
+
 📡 엔드포인트: POST /process
-🔁 입력: { "text": "엄마한테 삼만원 보내줘" }
-✅ 출력: intent, recipient, amount, response 포함 JSON
+
+입력: { "text": "엄마한테 삼만원 보내줘" }
+출력: intent, recipient, amount, response 포함 JSON

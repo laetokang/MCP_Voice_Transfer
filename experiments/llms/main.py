@@ -1,3 +1,4 @@
+# pip install fastapi uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 import time
@@ -41,6 +42,11 @@ def unified_system_prompt(input_text: str) -> list:
         text: "엄마한테 삼만원 보내줘"
 
         {{ "intent": "transfer", "amount": 30000, "recipient": "엄마", "response": "엄마님께 30,000원을 송금해드릴까요?" }}
+         
+        text: "송금할래"
+        
+        {{"intent": "transfer","amount": null,"recipient": null,"response": "송금하실 대상과 금액을 말씀해주세요."}}
+
 
         **주의**:
         - `intent`는 반드시 위의 범주 중 하나로만 반환되어야 합니다.

@@ -150,6 +150,61 @@ def unified_system_prompt3(input_text: str) -> list:
     return [system_message, user_message]
     # return [user_message]
 
+#%%
+def unified_system_prompt4(input_text: str) -> list:
+    system_message = {
+        "role": "system",
+        "content": f"""
+        다음 문장을 분석하여 intent, amount, recipient, response를 예시 형식에 맞게 추출해 주세요.
+
+        **intent**는 다음 중 하나입니다:
+        - `transfer`: 사용자가 금전을 송금하려는 의도
+        - `confirm`: 이전 발화의 확인 또는 반복
+        - `cancel`: 이전 동작을 취소하거나 거절하는 의도
+        - `inquiry`: 송금 및 관련 정보 확인 요청
+        - `other`: 시스템과 관련 없는 일상적인 대화 또는 분류 불가한 문장
+        - `system_response`: 시스템의 재질문 또는 안내 응답
+
+        **amount**는 숫자만 (없으면 `None`)
+        **recipient**는 사람 이름 (없으면 `None`)
+        **response**는 고객님에게 제공할 자연스러운 안내 응답
+
+        예시:
+        text: "엄마한테 삼만원 보내줘"
+
+        {{ "intent": "transfer", "amount": 30000, "recipient": "엄마", "response": "엄마님께 30,000원을 송금해드릴까요?" }}
+        
+        text: "송금할래"
+        
+        {{"intent": "transfer","amount": null,"recipient": null,"response": "송금하실 대상과 금액을 말씀해주세요."}}
+        
+        text: "보내지 마",
+        
+        {{"intent": "cancel","recipient": null,"amount": null,"response": "요청하신 송금을 취소했습니다."}}
+        
+        text: "아, 삼만원 보내는 거였지",
+        
+        {{"intent": "confirm","recipient": null,"amount": 30000,"response": "30,000원 송금 요청으로 확인했습니다."}}
+  
+
+        **주의**:
+        - `intent`는 반드시 위의 범주 중 하나로만 반환되어야 합니다.
+        - `amount`는 명시된 숫자를 기반으로 하며 없을 경우 `None`을 반환합니다.
+        - `recipient`는 발화에서 언급된 사람의 이름을 추출합니다. 없을 경우 `None`입니다.
+        - `response`는 사용자의 발화에 대해 자연스러운 한국어 안내문을 생성해야 합니다.
+
+        **사용자 발화:**
+        {input_text}
+        """
+    }
+
+    user_message = {
+        "role": "user",
+        "content": input_text
+    }
+
+    return [system_message, user_message]
+    # return [user_message]
 
 # %%
 import json

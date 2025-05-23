@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+.gitmodules
+
+# Python virtual environments
+venv
+venv_*
+*/venv
+*/venv_*
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Log files
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor specific
+.vscode/
+.idea/
+.cursor/
+
+# Large files or directories (adjust as needed)
+# 예를 들어, 로컬에 이미 다운로드된 모델이나 큰 데이터셋이 있다면 제외
+# models/
+# data/
+# experiments/outputs/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/ 

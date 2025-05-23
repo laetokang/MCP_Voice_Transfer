@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+httpx>=0.20 # 비동기 HTTP 요청을 위해
+python-multipart # FastAPI가 form 데이터를 받을 때 필요할 수 있음 (여기선 Body 사용 중) 
+deep-translator 

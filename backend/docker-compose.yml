@@ -29,6 +29,12 @@ services:
     ports: ["7005:7005"]
     depends_on: [redis]
 
+  kokoro-tts:
+    build: ./kokoro-tts
+    ports: 
+      - "7006:7006"
+    depends_on: [redis]
+
   gateway:
     build: ./backend/gateway
     ports: ["8000:8000"]

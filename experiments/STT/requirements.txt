@@ -1,0 +1,9 @@
+fastapi>=0.100.0
+uvicorn[standard]>=0.20.0
+python-multipart>=0.0.5
+# For insanely-fast-whisper library mode
+transformers>=4.36.0
+optimum>=1.16.0
+accelerate>=0.25.0
+# torch, torchaudio, torchvision are included in the base image
+# flash-attn will be installed separately 

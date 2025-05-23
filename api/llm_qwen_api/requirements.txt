@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Transformers 및 PyTorch (Qwen 모델 구동용)
+transformers>=4.30.0 # Qwen2.5는 비교적 최신 transformers 필요 가능성
+torch
+# CUDA 사용 시: torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cuXXX (cuXXX는 CUDA 버전에 맞게)
+
+# 기타 유틸리티
+# tokenizers # transformers가 보통 같이 설치함 

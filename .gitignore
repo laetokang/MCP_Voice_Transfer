@@ -68,3 +68,6 @@ frontend/coverage/
 backend/venv/
 backend/__pycache__/
 backend/*.pyc
+
+# Python 가상 환경
+venv_qwen_api/
